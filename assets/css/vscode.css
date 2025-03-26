@@ -1,0 +1,12 @@
+* {
+    user-select: none;
+}
+
+
+html, body {
+	height: 100%;
+	width: 100%;
+	/* font-size: var(--vscode-editor-font-size);
+	font-family: var(--vscode-editor-font-family); */
+}
+

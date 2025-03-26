@@ -1,0 +1,6 @@
+export const MessageTypes = {
+    VIEW_READY: 'VIEW_READY',
+    RUN_CMD_TERMINAL: 'RUN_CMD_TERMINAL',
+    RUN_CMD_RESULT: 'RUN_CMD_RESULT',
+    SHOW_DETAILS: 'OPEN_DETAILS'
+} as const;

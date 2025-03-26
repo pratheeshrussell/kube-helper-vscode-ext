@@ -1,0 +1,31 @@
+name: Feature Request
+description: Request to add a new feature to the project.
+title: "[Feature]: "
+labels: ["feature-request"]
+body:
+  - type: markdown
+    attributes:
+      value: '# Feature Request'
+  - type: textarea
+    id: description
+    attributes:
+      label: Explain briefly what you would like to see added
+      description: |
+        Please provide a clear description of the feature you would like to see added.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Mention the kubectl that will be used to get the data
+    validations:
+      required: false
+  - type: checkboxes
+    id: interested-in-raising-pr
+    attributes:
+      label: Code contribution
+      options:
+        - label: Are you interested in raising a PR for this feature?
+          required: false
+
+    

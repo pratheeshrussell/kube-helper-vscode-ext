@@ -1,0 +1,103 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { globalStore } from '../../store/store';
+import { useRoute, useRouter } from 'vue-router';
+import ContainerList from './elementList/ContainerList.vue';
+import LogViewer from '../common/LogViewer.vue';
+import { kubeCmds } from '@src/constants/commands';
+import DescribeViewer from '../common/DescribeViewer.vue';
+import RunExec from '../common/RunExec.vue';
+import PortForward from '../common/PortForward.vue';
+import DeleteResource from '../common/DeleteResource.vue';
+
+const route = useRoute();
+const router = useRouter();
+
+const podName = ref('');
+const value = ref('0');
+const isPodName = ref(false);
+
+const podLogsCommand = ref('');
+const podDescribeCommand = ref('');
+
+const podExecCommand = ref('');
+const podPortfwdCommand = ref('');
+const podPortDelCommand = ref('');
+
+onMounted(() => {
+    const name = route.params.podname;
+
+    if (name !== null && typeof name === 'string') {
+        podName.value = name;
+        isPodName.value = true;
+
+        podLogsCommand.value = kubeCmds.getLogsPod.replace('{{podname}}', name);
+        podDescribeCommand.value = kubeCmds.getDescribePod.replace('{{podname}}', name);
+
+        podExecCommand.value = kubeCmds.execPod.replace('{{podname}}', name);
+        podPortfwdCommand.value = kubeCmds.portfwdPod.replace('{{podname}}', name);
+        podPortDelCommand.value = kubeCmds.deletePod.replace('{{podname}}', name);
+
+        const lastBreadcrumb = globalStore.breadcrumbItems[globalStore.breadcrumbItems.length - 1];
+        if (!lastBreadcrumb ||
+            lastBreadcrumb.navigateTo !== 'podoverview' ||
+            lastBreadcrumb.label !== name ) {
+            globalStore.breadcrumbItems = [
+                ...globalStore.breadcrumbItems,
+                {
+                    label: name,
+                    navigateTo: 'podoverview',
+                    params: { podname: name },
+                    index: globalStore.breadcrumbItems.length
+                }
+            ];
+        }
+    }
+})
+
+const handlePodDelete = () => {
+    const lastBreadcrumb = globalStore.breadcrumbItems[globalStore.breadcrumbItems.length - 1];
+    if (lastBreadcrumb && lastBreadcrumb.navigateTo === 'podoverview') {
+        globalStore.breadcrumbItems.pop();
+        router.back();
+    }
+}
+
+</script>
+
+<template>
+    <div class="pod-over-view" v-if="!isPodName">
+        <div>Unable to load pod details</div>
+    </div>
+    <div class="pod-over-view" v-if="isPodName">
+        <div class="d-flex flex-row-reverse p-2 pod-options">
+            <RunExec :execCommand="podExecCommand" />
+            <PortForward :portfwdCommand="podPortfwdCommand" />
+            <DeleteResource :deleteCommand="podPortDelCommand" @deleted="handlePodDelete" />
+        </div>
+        <Tabs v-model:value="value">
+            <TabList>
+                <Tab value="0">Containers</Tab>
+                <Tab value="1">Logs</Tab>
+                <Tab value="2">Describe</Tab>
+            </TabList>
+            <TabPanels>
+                <TabPanel value="0">
+                    <ContainerList />
+                </TabPanel>
+                <TabPanel value="1">
+                    <LogViewer :logCommand="podLogsCommand" />
+                </TabPanel>
+                <TabPanel value="2">
+                    <DescribeViewer :describeCommand="podDescribeCommand" />
+                </TabPanel>
+            </TabPanels>
+        </Tabs>
+    </div>
+</template>
+
+<style scoped>
+.pod-options{
+   background-color: var(--p-surface-900);
+}
+</style>

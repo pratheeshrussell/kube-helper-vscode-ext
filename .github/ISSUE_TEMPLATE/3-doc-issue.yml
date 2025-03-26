@@ -1,0 +1,23 @@
+name: Document update
+description: Request change in doc
+title: "[DOC]: "
+labels: ["doc"]
+body:
+  - type: markdown
+    attributes:
+      value: '# Doc Update'
+  - type: textarea
+    id: description
+    attributes:
+      label: Mention the change you are expecting
+      description: |
+        Please provide a clear description.
+    validations:
+      required: true
+  - type: checkboxes
+    id: interested-in-raising-pr
+    attributes:
+      label: Code contribution
+      options:
+        - label: Are you interested in raising a PR for this doc?
+          required: false

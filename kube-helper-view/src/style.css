@@ -1,0 +1,48 @@
+:root {
+    --body-bg: var(--vscode-sideBar-background);
+    --body-text-color: var(--vscode-foreground);
+    --card-border: 1px solid var(--border-color);
+    --card-bg: var(--vscode-sideBar-background);
+    --border-color: var(--p-surface-200);
+    --text-color: var(--vscode-foreground);
+    --overlay-background: var(--vscode-sideBar-background);
+
+    /* Tabs */
+    --p-tabs-tabpanel-background:var(--vscode-editor-background);
+    --p-tabs-tabpanel-color: var(--vscode-editor-foreground);
+    /* Table */
+    --p-datatable-header-background:var(--vscode-editor-background);
+    --p-datatable-header-color: var(--vscode-editor-foreground);
+}
+
+
+
+
+html {
+    font-size: 14px;
+}
+
+body.cluster-details {
+    --body-bg: var(--vscode-editor-background);
+    --body-text-color: var(--vscode-editor-foreground);
+    --text-color: var(--vscode-editor-foreground);
+}
+
+body {
+    margin: 0px;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: var(--body-bg);
+    font-weight: normal;
+    color: var(--body-text-color);
+    padding: 1rem;
+}
+
+.card {
+    background: var(--card-bg);
+    border: var(--card-border);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
