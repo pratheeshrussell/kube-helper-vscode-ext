@@ -1,6 +1,6 @@
 <template>
     <DataTable :value="nodeTableData" v-model:filters="filters"
-    paginator :rows="10" dataKey="id" filterDisplay="row" :loading="loading">
+    paginator :rows="10" dataKey="name" filterDisplay="row" :loading="loading">
     <template #header>
         <div class="flex justify-end">
           <IconField>
@@ -50,11 +50,8 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { kubeCmds } from '../../../constants/commands';
 import { MessageTypes } from '@common/messageTypes';
 import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
 import type { ClusterNodeTableData, ClusterNodeType } from '../../../types/clustertype.type';
 import { HelperUtils } from '../../../utils/helpers';
-
-TimeAgo.addDefaultLocale(en)
 
 
 const nodeData = ref<ClusterNodeType| null>(null);

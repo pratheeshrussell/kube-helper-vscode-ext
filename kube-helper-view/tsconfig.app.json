@@ -9,7 +9,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-
+    "types": ["node"],
     "paths": {
       "@src/*": ["./src/*"],
       "@store/*" : ["./src/store/*"],

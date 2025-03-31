@@ -4,6 +4,8 @@ import Namespaces from './elementList/Namespaces.vue';
 import ClusterNodes from './elementList/ClusterNodes.vue';
 import { globalStore } from '../../store/store';
 import PodList from './elementList/PodList.vue';
+import EventList from './elementList/EventList.vue';
+import StorageClassList from './elementList/StorageClassList.vue';
 
 const value = ref('0');
 const isContext = ref(false);
@@ -31,8 +33,9 @@ onMounted(() => {
             <TabList>
                 <Tab value="0">Namespaces</Tab>
                 <Tab value="1">Nodes</Tab>
-                <Tab value="2">Persistant Volumes & Storage Classes</Tab>
+                <Tab value="2">Storage Classes</Tab>
                 <Tab value="3">Pods</Tab>
+                <Tab value="4">Events</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -42,10 +45,13 @@ onMounted(() => {
                     <ClusterNodes />
                 </TabPanel>
                 <TabPanel value="2">
-                    <div>NOT DONE</div>
+                    <StorageClassList />
                 </TabPanel>
                 <TabPanel value="3">
                     <PodList />
+                </TabPanel>
+                <TabPanel value="4">
+                    <EventList />
                 </TabPanel>
             </TabPanels>
         </Tabs>

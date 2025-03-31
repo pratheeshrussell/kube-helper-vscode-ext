@@ -1,6 +1,6 @@
 <template>
     <DataTable :value="namespaceTableData" v-model:filters="filters"
-    paginator :rows="10" dataKey="id" filterDisplay="row" :loading="loading">
+    paginator :rows="10" dataKey="name" filterDisplay="row" :loading="loading">
     <template #header>
         <div class="flex justify-end">
           <IconField>
@@ -40,12 +40,8 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { kubeCmds } from '../../../constants/commands';
 import { MessageTypes } from '@common/messageTypes';
 import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
 import { HelperUtils } from '../../../utils/helpers';
 import { useRouter } from 'vue-router';
-
-TimeAgo.addDefaultLocale(en)
-
 
 const namespaceData = ref<NamespaceType| null>(null);
 const namespaceTableData = ref<NamespaceTableItem[]>([]);

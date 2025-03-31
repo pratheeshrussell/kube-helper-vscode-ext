@@ -1,6 +1,6 @@
 <template>
     <DataTable :value="containerTableData" v-model:filters="filters"
-    paginator :rows="10" dataKey="id" filterDisplay="row" :loading="loading">
+    paginator :rows="10" dataKey="name" filterDisplay="row" :loading="loading">
     <template #header>
         <div class="d-flex justify-content-between">
             <IconField>
@@ -57,13 +57,10 @@ import { onMounted, ref } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { kubeCmds } from '../../../constants/commands';
 import { MessageTypes } from '@common/messageTypes';
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
 import { HelperUtils } from '../../../utils/helpers';
 import { useRoute, useRouter } from 'vue-router';
 import type { Container, ContainerStatus, ContainerStatusState, ContainerTableItem, PodListTypeItem, TableContainerTypes } from '@src/types/podList.type';
 
-TimeAgo.addDefaultLocale(en)
 
 const podName = ref<string| null>(null);
 const podData = ref<PodListTypeItem| null>(null);

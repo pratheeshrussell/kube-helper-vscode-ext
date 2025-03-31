@@ -20,6 +20,7 @@
     "vue3-ace-editor": "^2.2.4"
   },
   "devDependencies": {
+    "@types/node": "^22.13.14",
     "@types/vscode": "^1.98.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",

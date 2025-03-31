@@ -5,7 +5,9 @@ import ClusterWideElements from "./components/clusterElements/ClusterWideElement
 import NamespaceElements from "./components/clusterElements/NamespaceElements.vue";
 import PodElement from "./components/clusterElements/PodElement.vue";
 import ContainerElement from "./components/clusterElements/ContainerElement.vue";
-
+import ServiceElement from "./components/clusterElements/ServiceElement.vue";
+import ConfigMapElement from "./components/clusterElements/ConfigMapElement.vue";
+import SecretElement from "./components/clusterElements/SecretElement.vue";
 const routes:Readonly<RouteRecordRaw[]> = [
     {path:'/sidebar', name:'sidebar', component: Sidebar},
     {path:'/clusterDetails', name:'clusterDetails', component: ClusterView,
@@ -14,6 +16,11 @@ const routes:Readonly<RouteRecordRaw[]> = [
             {path: 'ns/:namespace', name: 'namespaceoverview', component: NamespaceElements},
             {path: 'pod/:podname', name: 'podoverview', component: PodElement},
             {path: 'pod/:podname/c/:container', name: 'containeroverview', component: ContainerElement},
+
+            {path: 'svc/:svcname', name: 'svcoverview', component: ServiceElement},
+
+            {path: 'configmap/:cmname', name: 'configmapoverview', component: ConfigMapElement},
+            {path: 'secret/:secretname', name: 'secretoverview', component: SecretElement},
 
             {path: '', redirect: { name: 'clusteroverview' }},
         ]

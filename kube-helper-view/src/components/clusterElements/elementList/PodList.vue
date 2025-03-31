@@ -1,6 +1,6 @@
 <template>
     <DataTable :value="podTableData" v-model:filters="filters"
-    paginator :rows="5" dataKey="id" filterDisplay="row" :loading="loading">
+    paginator :rows="5" dataKey="name" filterDisplay="row" :loading="loading">
     <template #header>
         <div class="d-flex justify-content-between">
             <IconField>
@@ -65,14 +65,10 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { kubeCmds } from '../../../constants/commands';
 import { MessageTypes } from '@common/messageTypes';
 import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
 import { HelperUtils } from '../../../utils/helpers';
 import type { PodListType, PodTableItem } from '../../../types/podList.type';
 import { globalStore } from '../../../store/store';
 import { useRouter } from 'vue-router';
-
-TimeAgo.addDefaultLocale(en)
-
 
 const podListData = ref<PodListType| null>(null);
 const podTableData = ref<PodTableItem[]>([]);
