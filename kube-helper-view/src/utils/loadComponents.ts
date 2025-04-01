@@ -16,6 +16,7 @@ import DataView from 'primevue/dataview';
 import Dialog from 'primevue/dialog';
 import RadioButton from 'primevue/radiobutton';
 import InputNumber from 'primevue/inputnumber';
+import Checkbox from 'primevue/checkbox';
 
 
 import RefreshData from "../components/common/RefreshData.vue";
@@ -32,7 +33,7 @@ export const loadPrimeComponents = (app: App<Element>) => {
     app.directive('tooltip', Tooltip);
 
     const components = {
-        DataTable, Column, InputText, InputIcon, 
+        DataTable, Column, InputText, InputIcon, Checkbox,
         IconField, Button,Tabs, TabList, Tab, InputNumber,
         TabPanels, TabPanel,DataView, Dialog,RadioButton,
         RefreshData,VAceEditor

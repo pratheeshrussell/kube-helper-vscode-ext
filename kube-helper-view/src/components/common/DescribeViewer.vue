@@ -39,7 +39,7 @@ const getLogs = () => {
     loading.value = true;
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
-        subType: 'getLog',
+        subType: 'getDescribe',
         command: HelperUtils.prepareCommand(inputprops.describeCommand)
     });
 };
@@ -127,7 +127,7 @@ function handleSearch(searchTerm: string) {
 }
 
 window.addEventListener('message', (event) => {
-    if (event.data.type == "getLog") {
+    if (event.data.type == "getDescribe") {
         if (event.data.data) {
             if (event.data?.data?.error) {
                 logData.value = event.data?.data?.errormessage +

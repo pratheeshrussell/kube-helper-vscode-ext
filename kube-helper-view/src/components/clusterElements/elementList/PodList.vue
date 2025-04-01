@@ -66,9 +66,10 @@ import { kubeCmds } from '../../../constants/commands';
 import { MessageTypes } from '@common/messageTypes';
 import TimeAgo from 'javascript-time-ago';
 import { HelperUtils } from '../../../utils/helpers';
-import type { PodListType, PodTableItem } from '../../../types/podList.type';
+
 import { globalStore } from '../../../store/store';
 import { useRouter } from 'vue-router';
+import type { PodListType, PodTableItem } from '@src/types/podList.type';
 
 const podListData = ref<PodListType| null>(null);
 const podTableData = ref<PodTableItem[]>([]);
@@ -113,7 +114,8 @@ window.addEventListener('message', (event) => {
         if(configDetails?.items?.length > 0){
             const timeAgo = new TimeAgo('en-US');
             const tData = configDetails.items.map(item => {
-                const age = timeAgo.format(new Date(item.metadata.creationTimestamp));
+                const timestamp = item.metadata?.creationTimestamp || (new Date()).toISOString();
+                const age = timeAgo.format(new Date(timestamp));
                 
                 let readyInitContainers = 0;
                 let readyInitContainersTotal = 0;
@@ -121,12 +123,12 @@ window.addEventListener('message', (event) => {
                 let readyContainers = 0;
                 let totalContainers = 0;
                 item.status?.initContainerStatuses?.forEach((container, index) => {
-                    if(container.state.terminated && container.state.terminated.exitCode == 0){
+                    if(container?.state && container.state.terminated && container.state.terminated.exitCode == 0){
                         readyInitContainers++;
                     }else{
-                       if(container.state.waiting && container.state.waiting?.reason != null){
+                       if(container?.state && container.state.waiting && container.state.waiting?.reason != null){
                         initContainerError = `Init (${index}): ${container.state.waiting.reason}`;
-                       } else if (container.state.terminated && container.state.terminated.exitCode != 0){
+                       } else if (container?.state && container.state.terminated && container.state.terminated.exitCode != 0){
                         initContainerError = `Init (${index}): ${container.state.terminated.reason}`;
                        }
                     }
@@ -134,8 +136,8 @@ window.addEventListener('message', (event) => {
                 });
                 //let containerError = 'TODO: SHOW ERROR';
                 item.status?.containerStatuses?.forEach(container => {
-                    if((container.state.terminated?.exitCode === 0) ||
-                    (container.state.running !== undefined)){
+                    if(container?.state && ((container.state.terminated?.exitCode === 0) ||
+                    (container.state.running !== undefined))){
                         readyContainers++;
                     }else{
                       //  containerError = "TODO: SHOW ERROR";
@@ -145,9 +147,9 @@ window.addEventListener('message', (event) => {
 
                 // Find status
                 let status = '';
-                if (item.status.phase === 'Failed') {
+                if (item.status && item.status.phase === 'Failed') {
                     status = 'Failed';
-                } else if (item.status.phase === 'Pending') {
+                } else if (item.status && item.status.phase === 'Pending') {
                     if (readyInitContainers < readyInitContainersTotal) {
                         status = initContainerError || `Init: ${readyInitContainers}/${readyInitContainersTotal}`;
                     } else {
@@ -176,11 +178,11 @@ window.addEventListener('message', (event) => {
                     restartCount = containerRestartCount;
                 }
                 return {
-                    namespace: item.metadata.namespace,
-                    name: item.metadata.name,
+                    namespace: item.metadata?.namespace || 'default',
+                    name: item.metadata?.name || '-',
                     age: age,
-                    timestamp: item.metadata.creationTimestamp,
-                    primaryOwner:ownerReferences?.length > 0 ? ownerReferences[0] : null,
+                    timestamp: timestamp,
+                    primaryOwner:ownerReferences && ownerReferences?.length > 0 ? ownerReferences[0] : null,
                     ready: `${readyContainers}/${totalContainers}`,
                     status: status,
                     restarts: restartCount.toString()

@@ -63,7 +63,7 @@ onMounted(() => {
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
-                    <LogViewer :logCommand="containerLogsCommand"  />
+                    <LogViewer :logCommand="containerLogsCommand" :allowPrevious="true"  />
                 </TabPanel>
                 
             </TabPanels>

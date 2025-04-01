@@ -65,15 +65,20 @@ onMounted(() => {
                 <template #list="slotProps">
                     <div class="d-flex flex-column">
                         <div v-for="(item, index) in slotProps.items" :key="index">
-                            <div class="d-flex flex-column flex-md-column justify-content-between align-items-start p-1" 
+                            <div class="d-flex flex-column justify-content-between p-3" 
                             :class="{ 'border-top border-light': index !== 0 }">
-                              <div class="mt-2 mb-1">
+                            <div class="d-flex flex-row justify-content-between align-items-center mt-2 mb-1">
+                              <div>
                                 <div class="fs-2 fw-bold">{{ item.clusterName }}</div>
                               </div>
-                              <div class="m-2">
+                              <div v-if="item.active">
+                                <i class="pi pi-star-fill" v-tooltip="'Default Context'" style="color: #ffff00" />
+                              </div>
+                            </div>
+                              <div class="d-flex flex-row-reverse my-3">
                                 <Button label="View" @click="showClusterDetails(item.contextName, item.clusterName)"
                                 :disabled="item.clusterName === ''" size="small"
-                                class="flex-fill flex-md-grow-0 text-nowrap"></Button>
+                                class="text-nowrap"></Button>
                               </div>
                             </div>
                         </div>

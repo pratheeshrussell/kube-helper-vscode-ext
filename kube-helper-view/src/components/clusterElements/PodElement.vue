@@ -86,7 +86,7 @@ const handlePodDelete = () => {
                     <ContainerList />
                 </TabPanel>
                 <TabPanel value="1">
-                    <LogViewer :logCommand="podLogsCommand" />
+                    <LogViewer :logCommand="podLogsCommand" :allowPrevious="true" />
                 </TabPanel>
                 <TabPanel value="2">
                     <DescribeViewer :describeCommand="podDescribeCommand" />

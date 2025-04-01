@@ -94,17 +94,17 @@ window.addEventListener('message', (event) => {
         const configDetails = JSON.parse(event.data.data) as PodListTypeItem;
         const localcontainerTableData: ContainerTableItem[] = [];
         
-        if(configDetails?.spec?.initContainers && configDetails?.spec?.initContainers?.length > 0){
+        if(configDetails?.spec && configDetails?.spec?.initContainers && configDetails?.spec?.initContainers?.length > 0){
            const initItems:ContainerTableItem[] = extractTableData(
             configDetails.spec.initContainers, 
-            configDetails.status.initContainerStatuses!,
+            configDetails.status?.initContainerStatuses!,
             'init');
            localcontainerTableData.push(...initItems);
         }
-        if(configDetails?.spec?.containers?.length > 0){
+        if(configDetails?.spec && configDetails?.spec?.containers?.length > 0){
             const containerItems:ContainerTableItem[] = extractTableData(
                 configDetails.spec.containers, 
-                configDetails.status.containerStatuses,
+                configDetails.status?.containerStatuses!,
                 'container');
             localcontainerTableData.push(...containerItems);
         }
@@ -146,7 +146,7 @@ const extractTableData = (containers: Container[],statuses: ContainerStatus[], t
                 }
                 tableData.push({
                     name: container.name,
-                    image: container.image,
+                    image: container?.image || '',
                     type: type,
                     status: status ? status.toString() : '',
                     reason: reason ?? '',

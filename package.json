@@ -5,7 +5,7 @@
   "publisher": "PratheeshRussell",
   "repository": "https://github.com/pratheeshrussell/kube-helper-vscode-ext",
   "icon": "assets/images/kube-helper.png",
-  "version": "0.0.1-test.2",
+  "version": "0.0.1-test.3",
   "engines": {
     "vscode": "^1.98.0"
   },
@@ -41,6 +41,7 @@
     "compile:view": "cd kube-helper-view && npm run build",
     "compile": "npm run check-types && npm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
+    "watch:view": "cd kube-helper-view && npm run watch",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run check-types && npm run lint && node esbuild.js --production",

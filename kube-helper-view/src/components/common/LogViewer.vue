@@ -6,8 +6,17 @@
                 </InputIcon>
                 <InputText v-model="searchTerm" placeholder="Find" />
             </IconField>
-
-            <RefreshData :reloadFunction="getDescribeData" />
+            <div class="d-flex align-items-center">
+                <span class="d-flex me-2">
+                    <Checkbox v-if="allowPrevious" v-model="addPrevOption" 
+                    inputId="log-prev" binary />
+                    <label for="log-prev" class="mx-1"> Previous </label>
+                </span>
+                <Button label="Follow Log" size="small" class="mx-1"
+                    aria-label="Follow log Data" @click="followLogData" />
+                <RefreshData :reloadFunction="getLogData" />
+            </div>
+            
     </div>
     <div v-if="!loading">
         <v-ace-editor v-model:value="logData" readonly @init="editorInit" lang="text" theme="cloud_editor_dark"
@@ -26,6 +35,10 @@ const inputprops = defineProps({
     logCommand: {
         type: String,
         required: true
+    },
+    allowPrevious: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -34,15 +47,39 @@ const searchTerm = ref('');
 
 const logData = ref('');
 const editor = ref<ace.Editor | null>(null);
+const addPrevOption = ref(false);
 
-const getDescribeData = () => {
+const getLogData = () => {
     loading.value = true;
+    let cmd = inputprops.logCommand;
+    if(addPrevOption.value) {
+        cmd = cmd + ' --previous';
+    }
+
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
-        subType: 'getDescribe',
-        command: HelperUtils.prepareCommand(inputprops.logCommand)
+        subType: 'getLog',
+        command: HelperUtils.prepareCommand(cmd)
     });
 };
+
+const followLogData = () => {
+    let cmd = inputprops.logCommand;
+    if(addPrevOption.value) {
+        cmd = cmd + ' --previous';
+    }
+    cmd = cmd + ' -f';
+
+    tsvscode?.postMessage({
+        type: MessageTypes.RUN_CMD_TERMINAL,
+        subType: 'followLog',
+        command: HelperUtils.prepareCommand(cmd)
+    });
+};
+
+watch(addPrevOption, () => {
+    getLogData();
+});
 
 function editorInit(aceEditor: any) {
     aceEditor.commands.removeCommand('find');
@@ -127,7 +164,7 @@ const handleSearch = (searchTerm: string) => {
 }
 
 window.addEventListener('message', (event) => {
-    if (event.data.type == "getDescribe") {
+    if (event.data.type == "getLog") {
         if (event.data.data) {
             if (event.data?.data?.error) {
                 logData.value = event.data?.data?.errormessage +
@@ -141,6 +178,6 @@ window.addEventListener('message', (event) => {
 });
 
 onMounted(() => {
-    getDescribeData();
+    getLogData();
 });
 </script>
