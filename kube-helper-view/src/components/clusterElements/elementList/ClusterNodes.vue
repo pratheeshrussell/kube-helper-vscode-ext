@@ -2,13 +2,15 @@
     <DataTable :value="nodeTableData" v-model:filters="filters"
     paginator :rows="10" dataKey="name" filterDisplay="row" :loading="loading">
     <template #header>
-        <div class="flex justify-end">
-          <IconField>
-            <InputIcon>
-                <i class="pi pi-search" />
-            </InputIcon>
-            <InputText v-model="filters['global'].value" placeholder="Global Search" />
-          </IconField>
+        <div class="d-flex justify-content-between">
+            <IconField>
+                <InputIcon>
+                    <i class="pi pi-search" />
+                </InputIcon>
+                <InputText v-model="filters['global'].value" placeholder="Global Search" />
+            </IconField>
+
+            <RefreshData :reloadFunction="getNodeDetails" />
         </div>
     </template>
     <template #empty> No nodes found. </template>
@@ -64,7 +66,6 @@ const filters = ref({
 
 const getNodeDetails = () => {
     loading.value = true;
-    // TODO replace context or it wont work
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'clusterNodeDetails',

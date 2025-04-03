@@ -2,13 +2,15 @@
     <DataTable :value="namespaceTableData" v-model:filters="filters"
     paginator :rows="10" dataKey="name" filterDisplay="row" :loading="loading">
     <template #header>
-        <div class="flex justify-end">
-          <IconField>
-            <InputIcon>
-                <i class="pi pi-search" />
-            </InputIcon>
-            <InputText v-model="filters['global'].value" placeholder="Global Search" />
-          </IconField>
+        <div class="d-flex justify-content-between">
+            <IconField>
+                <InputIcon>
+                    <i class="pi pi-search" />
+                </InputIcon>
+                <InputText v-model="filters['global'].value" placeholder="Global Search" />
+            </IconField>
+
+            <RefreshData :reloadFunction="getNamespacesDetails" />
         </div>
     </template>
     <template #empty> No namespace found. </template>

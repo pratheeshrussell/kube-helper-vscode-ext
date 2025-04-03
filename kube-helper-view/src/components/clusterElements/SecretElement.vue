@@ -6,6 +6,7 @@ import DescribeViewer from '../common/DescribeViewer.vue';
 import { kubeCmds } from '@src/constants/commands';
 import { HelperUtils } from '@src/utils/helpers';
 import SecretData from './elementList/SecretData.vue';
+import EditResource from '../common/EditResource.vue';
 
 const route = useRoute();
 
@@ -15,6 +16,7 @@ const value = ref('0');
 const isSecretName = ref(false);
 
 const secretDescribeCommand = ref('');
+const secretEditCommand = ref('');
 
 
 onMounted(() => {
@@ -28,6 +30,8 @@ onMounted(() => {
 
         secretDescribeCommand.value = HelperUtils.prepareCommand(
         kubeCmds.getDescribeSecret.replace("{{secretname}}",secretname));
+
+        secretEditCommand.value = kubeCmds.editSecret.replace('{{secretname}}', secretname);
         
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,
@@ -49,7 +53,7 @@ onMounted(() => {
     </div>
     <div class="svc-over-view" v-if="isSecretName">
         <div class="d-flex flex-row-reverse p-2 secret-options">
-            
+            <EditResource :editCommand="secretEditCommand" buttonText="Edit Secret" />
         </div>
         <Tabs v-model:value="value">
             <TabList>

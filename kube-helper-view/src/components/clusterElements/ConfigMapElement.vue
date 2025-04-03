@@ -6,6 +6,7 @@ import DescribeViewer from '../common/DescribeViewer.vue';
 import { kubeCmds } from '@src/constants/commands';
 import { HelperUtils } from '@src/utils/helpers';
 import ConfigMapData from './elementList/ConfigMapData.vue';
+import EditResource from '../common/EditResource.vue';
 
 const route = useRoute();
 
@@ -15,7 +16,7 @@ const value = ref('0');
 const isCmName = ref(false);
 
 const cmDescribeCommand = ref('');
-
+const cmEditCommand = ref('');
 
 onMounted(() => {
     const cmname = route.params.cmname;
@@ -28,6 +29,8 @@ onMounted(() => {
 
         cmDescribeCommand.value = HelperUtils.prepareCommand(
         kubeCmds.getDescribeConfigMap.replace("{{cmname}}",cmname));
+
+        cmEditCommand.value = kubeCmds.editConfigMap.replace('{{cmname}}', cmname);
         
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,
@@ -49,7 +52,7 @@ onMounted(() => {
     </div>
     <div class="svc-over-view" v-if="isCmName">
         <div class="d-flex flex-row-reverse p-2 confmap-options">
-            
+            <EditResource :editCommand="cmEditCommand" buttonText="Edit ConfigMap" />
         </div>
         <Tabs v-model:value="value">
             <TabList>

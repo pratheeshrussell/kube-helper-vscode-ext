@@ -8,6 +8,7 @@ import ContainerElement from "./components/clusterElements/ContainerElement.vue"
 import ServiceElement from "./components/clusterElements/ServiceElement.vue";
 import ConfigMapElement from "./components/clusterElements/ConfigMapElement.vue";
 import SecretElement from "./components/clusterElements/SecretElement.vue";
+import IngressElement from "./components/clusterElements/IngressElement.vue";
 const routes:Readonly<RouteRecordRaw[]> = [
     {path:'/sidebar', name:'sidebar', component: Sidebar},
     {path:'/clusterDetails', name:'clusterDetails', component: ClusterView,
@@ -21,6 +22,7 @@ const routes:Readonly<RouteRecordRaw[]> = [
 
             {path: 'configmap/:cmname', name: 'configmapoverview', component: ConfigMapElement},
             {path: 'secret/:secretname', name: 'secretoverview', component: SecretElement},
+            {path: 'ingress/:ingressname', name: 'ingressoverview', component: IngressElement},
 
             {path: '', redirect: { name: 'clusteroverview' }},
         ]

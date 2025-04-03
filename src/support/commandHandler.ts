@@ -12,16 +12,16 @@ export const runCommand = async (command: string) => {
                 output: stdout,
                 error: true,
                 errormessage: stderr
-            }
+            };
         }
         return stdout.trim();
     } catch (error) {
         return {
             error: true,
             message: error
-        }
+        };
     }
-}
+};
 
 export const runCommandTerminal = async (command: string) => {
     try {
@@ -31,4 +31,4 @@ export const runCommandTerminal = async (command: string) => {
     } catch (error) {
         vscode.window.showErrorMessage(`Failed to execute command: ${error}`);
     }
-}
+};

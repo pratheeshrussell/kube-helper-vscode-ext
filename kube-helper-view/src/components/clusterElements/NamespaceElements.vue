@@ -9,6 +9,8 @@ import ConfigMapList from './elementList/ConfigMapList.vue';
 import SecretList from './elementList/SecretList.vue';
 import PVList from './elementList/PVList.vue';
 import PVCList from './elementList/PVCList.vue';
+import IngressList from './elementList/IngressList.vue';
+import EndpointList from './elementList/EndpointList.vue';
 
 const route = useRoute();
 
@@ -44,7 +46,9 @@ onMounted(() => {
                 <Tab value="3">Secrets</Tab>
                 <Tab value="4">Persistent Vol</Tab>
                 <Tab value="5">PVC</Tab>
-                <Tab value="6">Events</Tab>
+                <Tab value="6">Ingress</Tab>
+                <Tab value="7">Endpoints</Tab>
+                <Tab value="8">Events</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -59,16 +63,19 @@ onMounted(() => {
                 <TabPanel value="3">
                     <SecretList />
                 </TabPanel>
-
-
                 <TabPanel value="4">
                     <PVList />
                 </TabPanel>
                 <TabPanel value="5">
                     <PVCList />
                 </TabPanel>
-               
                 <TabPanel value="6">
+                    <IngressList />
+                </TabPanel>
+                <TabPanel value="7">
+                    <EndpointList />
+                </TabPanel>
+                <TabPanel value="8">
                     <EventList />
                 </TabPanel>
             </TabPanels>

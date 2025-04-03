@@ -6,6 +6,7 @@ import DescribeViewer from '../common/DescribeViewer.vue';
 import { kubeCmds } from '@src/constants/commands';
 import { HelperUtils } from '@src/utils/helpers';
 import PortForward from '../common/PortForward.vue';
+import EditResource from '../common/EditResource.vue';
 
 const route = useRoute();
 
@@ -16,6 +17,7 @@ const isSvcName = ref(false);
 
 const svcDescribeCommand = ref('');
 const svcPortfwdCommand = ref('');
+const svcEditCommand = ref('');
 
 onMounted(() => {
     const svcname = route.params.svcname;
@@ -31,6 +33,8 @@ onMounted(() => {
 
         svcPortfwdCommand.value = HelperUtils.prepareCommand(
         kubeCmds.portfwdSvc.replace("{{svcname}}",svcname));
+
+        svcEditCommand.value = kubeCmds.editSvc.replace("{{svcname}}",svcname);
         
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,
@@ -53,6 +57,7 @@ onMounted(() => {
     <div class="svc-over-view" v-if="isSvcName">
         <div class="d-flex flex-row-reverse p-2 svc-options">
             <PortForward :portfwdCommand="svcPortfwdCommand" />
+            <EditResource  :editCommand="svcEditCommand"  buttonText="Edit Service" />
         </div>
         <Tabs v-model:value="value">
             <TabList>

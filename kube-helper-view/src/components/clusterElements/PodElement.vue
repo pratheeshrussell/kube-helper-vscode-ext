@@ -9,6 +9,7 @@ import DescribeViewer from '../common/DescribeViewer.vue';
 import RunExec from '../common/RunExec.vue';
 import PortForward from '../common/PortForward.vue';
 import DeleteResource from '../common/DeleteResource.vue';
+import EditResource from '../common/EditResource.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -23,6 +24,7 @@ const podDescribeCommand = ref('');
 const podExecCommand = ref('');
 const podPortfwdCommand = ref('');
 const podPortDelCommand = ref('');
+const podEditCommand = ref('');
 
 onMounted(() => {
     const name = route.params.podname;
@@ -37,6 +39,8 @@ onMounted(() => {
         podExecCommand.value = kubeCmds.execPod.replace('{{podname}}', name);
         podPortfwdCommand.value = kubeCmds.portfwdPod.replace('{{podname}}', name);
         podPortDelCommand.value = kubeCmds.deletePod.replace('{{podname}}', name);
+
+        podEditCommand.value = kubeCmds.editPod.replace('{{podname}}', name);
 
         const lastBreadcrumb = globalStore.breadcrumbItems[globalStore.breadcrumbItems.length - 1];
         if (!lastBreadcrumb ||
@@ -74,6 +78,7 @@ const handlePodDelete = () => {
             <RunExec :execCommand="podExecCommand" />
             <PortForward :portfwdCommand="podPortfwdCommand" />
             <DeleteResource :deleteCommand="podPortDelCommand" @deleted="handlePodDelete" />
+            <EditResource :editCommand="podEditCommand" buttonText="Edit Pod" />
         </div>
         <Tabs v-model:value="value">
             <TabList>
