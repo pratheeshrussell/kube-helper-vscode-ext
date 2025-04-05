@@ -13,6 +13,7 @@ import IngressList from './elementList/IngressList.vue';
 import EndpointList from './elementList/EndpointList.vue';
 import RoleList from './elementList/RoleList.vue';
 import RoleBindingList from './elementList/RoleBindingList.vue';
+import SAList from './elementList/SAList.vue';
 
 const route = useRoute();
 
@@ -53,6 +54,7 @@ onMounted(() => {
                 <Tab value="8">Events</Tab>
                 <Tab value="9">Roles</Tab>
                 <Tab value="10">Role Binding</Tab>
+                <Tab value="11">Service Account</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -87,6 +89,9 @@ onMounted(() => {
                 </TabPanel>
                 <TabPanel value="10">
                     <RoleBindingList />
+                </TabPanel>
+                <TabPanel value="11">
+                    <SAList />
                 </TabPanel>
             </TabPanels>
         </Tabs>

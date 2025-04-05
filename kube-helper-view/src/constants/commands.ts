@@ -26,6 +26,7 @@ export const kubeCmds = {
 
     getRoleList: "kubectl get roles {{namespace}} {{context}} -o json",
     getRoleBindingList: "kubectl get rolebindings {{namespace}} {{context}} -o json",
+    getServiceAccountList: "kubectl get serviceaccounts {{namespace}} {{context}} -o json",
 
     getLogsPod: "kubectl logs {{podname}} {{namespace}} {{context}}",
     getLogsContainer: "kubectl logs {{podname}} -c {{container}} {{namespace}} {{context}}",
@@ -40,6 +41,7 @@ export const kubeCmds = {
     getDescribeClusterRoleBind: "kubectl describe clusterrolebinding {{crbname}} {{context}}",
     getDescribeRole: "kubectl describe role {{rolename}} {{namespace}} {{context}}",
     getDescribeRoleBind: "kubectl describe rolebinding {{rbname}} {{namespace}} {{context}}",
+    getDescribeSaBind: "kubectl describe sa {{saname}} {{namespace}} {{context}}",
 
     execPod: "kubectl exec -it {{podname}} {{namespace}} {{context}} -- {{command}}",
     execContainer: "kubectl exec -it {{podname}} -c {{container}} {{namespace}} {{context}} -- {{command}}",
