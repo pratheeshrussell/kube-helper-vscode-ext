@@ -80,7 +80,7 @@ const handlePodDelete = () => {
             <DeleteResource :deleteCommand="podPortDelCommand" @deleted="handlePodDelete" />
             <EditResource :editCommand="podEditCommand" buttonText="Edit Pod" />
         </div>
-        <Tabs v-model:value="value">
+        <Tabs v-model:value="value" scrollable>
             <TabList>
                 <Tab value="0">Containers</Tab>
                 <Tab value="1">Logs</Tab>

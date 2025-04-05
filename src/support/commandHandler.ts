@@ -26,12 +26,14 @@ export const runCommand = async (command: string) => {
 
 export const runCommandTerminal = async (command: string) => {
     try {
-        const shell = vscode.workspace.getConfiguration('terminal').get<string>('integrated.defaultProfile.windows');
-        const setEditorCmd = Utils.getKubeEditorCommand(shell);
-        const terminal = vscode.window.createTerminal();
-        terminal.sendText(setEditorCmd);
+        const terminal = vscode.window.createTerminal({
+            env:{
+                "KUBE_EDITOR": "code --wait --new-window --reuse-window"
+            },
+            isTransient: false
+        });
         terminal.show();
-        terminal.sendText(command);
+        terminal.sendText(command, true);
     } catch (error) {
         vscode.window.showErrorMessage(`Failed to execute command: ${error}`);
     }

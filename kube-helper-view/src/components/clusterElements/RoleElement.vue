@@ -8,31 +8,32 @@ import { HelperUtils } from '@src/utils/helpers';
 
 const route = useRoute();
 
-const crName = ref('');
+const roleName = ref('');
 
 const value = ref('0');
-const isCrName = ref(false);
+const isRoleName = ref(false);
 
-const crDescribeCommand = ref('');
+const roleDescribeCommand = ref('');
 
 
 onMounted(() => {
-    const crname = route.params.crname;
+    const rolename = route.params.rolename;
 
-    if((crname !== null ) && 
-    (typeof crname === 'string')){
-        crName.value = crname;
+    if((rolename !== null ) && 
+    (typeof rolename === 'string')){
+        roleName.value = rolename;
         
-        isCrName.value = true;
+        isRoleName.value = true;
 
-        crDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeClusterRole.replace("{{crname}}",crname));
+        roleDescribeCommand.value = HelperUtils.prepareCommand(
+        kubeCmds.getDescribeRole.replace("{{rolename}}",rolename));
 
         globalStore.breadcrumbItems = [
+            ...globalStore.breadcrumbItems,
             {
-                label: crname, 
-                navigateTo: 'clusterRoleoverview', 
-                params:{crname: crname},
+                label: rolename, 
+                navigateTo: 'roleoverview', 
+                params:{rolename: rolename},
                 index: globalStore.breadcrumbItems.length
             }
         ];
@@ -42,11 +43,11 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="cr-over-view" v-if="!isCrName">
-        <div>Unable to load ingress details</div>
+    <div class="role-over-view" v-if="!isRoleName">
+        <div>Unable to load role details</div>
     </div>
-    <div class="cr-over-view" v-if="isCrName">
-        <div class="d-flex flex-row-reverse p-2 secret-options">
+    <div class="role-over-view" v-if="isRoleName">
+        <div class="d-flex flex-row-reverse p-2 role-options">
         
         </div>
         <Tabs v-model:value="value" scrollable>
@@ -56,7 +57,7 @@ onMounted(() => {
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
-                    <DescribeViewer :describeCommand="crDescribeCommand" />
+                    <DescribeViewer :describeCommand="roleDescribeCommand" />
                 </TabPanel>
                 
             </TabPanels>
@@ -65,7 +66,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.cr-options{
+.role-options{
     background-color: var(--p-surface-900);
 }
 

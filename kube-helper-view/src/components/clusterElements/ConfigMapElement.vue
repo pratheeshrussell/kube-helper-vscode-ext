@@ -54,7 +54,7 @@ onMounted(() => {
         <div class="d-flex flex-row-reverse p-2 confmap-options">
             <EditResource :editCommand="cmEditCommand" buttonText="Edit ConfigMap" />
         </div>
-        <Tabs v-model:value="value">
+        <Tabs v-model:value="value" scrollable>
             <TabList>
                 <Tab value="0">Data</Tab>
                 <Tab value="1">Describe</Tab>

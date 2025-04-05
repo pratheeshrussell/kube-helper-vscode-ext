@@ -11,6 +11,8 @@ import PVList from './elementList/PVList.vue';
 import PVCList from './elementList/PVCList.vue';
 import IngressList from './elementList/IngressList.vue';
 import EndpointList from './elementList/EndpointList.vue';
+import RoleList from './elementList/RoleList.vue';
+import RoleBindingList from './elementList/RoleBindingList.vue';
 
 const route = useRoute();
 
@@ -38,7 +40,7 @@ onMounted(() => {
         <div>Unable to load namespace details</div>
     </div>
     <div class="ns-over-view" v-if="isNamespace">
-        <Tabs v-model:value="value">
+        <Tabs v-model:value="value" scrollable>
             <TabList>
                 <Tab value="0">Pods</Tab>
                 <Tab value="1">Services</Tab>
@@ -49,6 +51,8 @@ onMounted(() => {
                 <Tab value="6">Ingress</Tab>
                 <Tab value="7">Endpoints</Tab>
                 <Tab value="8">Events</Tab>
+                <Tab value="9">Roles</Tab>
+                <Tab value="10">Role Binding</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -77,6 +81,12 @@ onMounted(() => {
                 </TabPanel>
                 <TabPanel value="8">
                     <EventList />
+                </TabPanel>
+                <TabPanel value="9">
+                    <RoleList />
+                </TabPanel>
+                <TabPanel value="10">
+                    <RoleBindingList />
                 </TabPanel>
             </TabPanels>
         </Tabs>

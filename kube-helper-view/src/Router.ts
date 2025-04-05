@@ -11,6 +11,8 @@ import SecretElement from "./components/clusterElements/SecretElement.vue";
 import IngressElement from "./components/clusterElements/IngressElement.vue";
 import ClusterRoleElement from "./components/clusterElements/ClusterRoleElement.vue";
 import ClusterRoleBindElement from "./components/clusterElements/ClusterRoleBindElement.vue";
+import RoleElement from "./components/clusterElements/RoleElement.vue";
+import RoleBindElement from "./components/clusterElements/RoleBindElement.vue";
 const routes:Readonly<RouteRecordRaw[]> = [
     {path:'/sidebar', name:'sidebar', component: Sidebar},
     {path:'/clusterDetails', name:'clusterDetails', component: ClusterView,
@@ -29,6 +31,10 @@ const routes:Readonly<RouteRecordRaw[]> = [
             {path: 'clusterrole/:crname', name: 'clusterRoleoverview', component: ClusterRoleElement},
             {path: 'clusterrolebind/:crbname', name: 'clusterRoleBindoverview', component: ClusterRoleBindElement},
             
+            
+            {path: 'role/:rolename', name: 'roleoverview', component: RoleElement},
+            {path: 'rolebind/:rolebindname', name: 'rolebindoverview', component: RoleBindElement},
+
             {path: '', redirect: { name: 'clusteroverview' }},
         ]
     }

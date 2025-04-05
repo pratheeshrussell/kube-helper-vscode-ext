@@ -7,16 +7,4 @@ export class Utils {
         }
         return text;
     }
-
-    public static getKubeEditorCommand(shell: string | undefined) {
-        let setEditorCmd: string;
-        if (shell?.toLowerCase().includes('powershell')) {
-            setEditorCmd = '$env:KUBE_EDITOR = "code --wait --new-window --reuse-window"';
-        } else if (shell?.toLowerCase().includes('cmd')) {
-            setEditorCmd = 'set KUBE_EDITOR=code --wait --new-window --reuse-window';
-        } else {
-            setEditorCmd = 'export KUBE_EDITOR="code --wait --new-window --reuse-window"';
-        }
-        return setEditorCmd;
-    }
 }

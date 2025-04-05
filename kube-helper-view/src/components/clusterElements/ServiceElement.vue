@@ -59,7 +59,7 @@ onMounted(() => {
             <PortForward :portfwdCommand="svcPortfwdCommand" />
             <EditResource  :editCommand="svcEditCommand"  buttonText="Edit Service" />
         </div>
-        <Tabs v-model:value="value">
+        <Tabs v-model:value="value" scrollable>
             <TabList>
                 <Tab value="0">Describe</Tab>
                 
