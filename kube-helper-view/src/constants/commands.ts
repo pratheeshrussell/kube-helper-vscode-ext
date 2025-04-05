@@ -2,6 +2,7 @@ export const kubeCmds = {
     getClusters: "kubectl config view -o json",
     getNamespaces: "kubectl get namespaces {{context}} -o json",
     getScList: "kubectl get sc {{context}} -o json",
+    getIngressClassList: "kubectl get ingressclass {{context}} -o json",
 
     getClusterNodes: "kubectl get nodes {{context}} -o json",
     getPodList: "kubectl get pods {{namespace}} {{context}} -o json",
@@ -20,6 +21,9 @@ export const kubeCmds = {
     getIngressByName: "kubectl get ingress {{ingress}} {{namespace}} {{context}} -o json",
     getEndpointList: "kubectl get endpoints {{namespace}} {{context}} -o json",
 
+    getClusterRoleList: "kubectl get clusterroles {{context}} -o json",
+    getClusterRoleBindingList: "kubectl get clusterrolebindings {{context}} -o json",
+
     getLogsPod: "kubectl logs {{podname}} {{namespace}} {{context}}",
     getLogsContainer: "kubectl logs {{podname}} -c {{container}} {{namespace}} {{context}}",
     
@@ -29,6 +33,8 @@ export const kubeCmds = {
     getDescribeConfigMap: "kubectl describe configmap {{cmname}} {{namespace}} {{context}}",
     getDescribeSecret: "kubectl describe secret {{secretname}} {{namespace}} {{context}}",
     getDescribeIngress: "kubectl describe ingress {{ingressname}} {{namespace}} {{context}}",
+    getDescribeClusterRole: "kubectl describe clusterrole {{crname}} {{context}}",
+    getDescribeClusterRoleBind: "kubectl describe clusterrolebinding {{crbname}} {{context}}",
 
     execPod: "kubectl exec -it {{podname}} {{namespace}} {{context}} -- {{command}}",
     execContainer: "kubectl exec -it {{podname}} -c {{container}} {{namespace}} {{context}} -- {{command}}",

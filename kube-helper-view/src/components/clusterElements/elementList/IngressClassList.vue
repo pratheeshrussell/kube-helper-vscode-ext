@@ -1,5 +1,5 @@
 <template>
-    <DataTable :value="scTableData" v-model:filters="filters"
+    <DataTable :value="icTableData" v-model:filters="filters"
     paginator :rows="5" dataKey="name" filterDisplay="row" :loading="loading">
     <template #header>
         <div class="d-flex justify-content-between">
@@ -10,35 +10,25 @@
                 <InputText v-model="filters['global'].value" placeholder="Global Search" />
             </IconField>
 
-            <RefreshData :reloadFunction="getScList" />
+            <RefreshData :reloadFunction="getIcList" />
         </div>
     </template>
-    <template #empty> No storage class found. </template>
-    <template #loading> Loading sc. Please wait. </template>
+    <template #empty> No ingress class found. </template>
+    <template #loading> Loading ingress classes. Please wait. </template>
     
     <Column field="name" header="Name" style="min-width: 12rem">
         <template #body="{ data }">
             {{ data.name }}
         </template>
     </Column>
-    <Column field="provisioner" header="Provisioner" style="min-width: 12rem">
+    <Column field="controller" header="Controller" style="min-width: 12rem">
         <template #body="{ data }">
-            {{ data.provisioner }}
+            {{ data.controller }}
         </template>
     </Column>
-    <Column field="reclaim-policy" header="Reclaim Policy" style="min-width: 12rem">
+    <Column field="parameters" header="Parameters" style="min-width: 12rem">
         <template #body="{ data }">
-            {{ data.reclaimPolicy }}
-        </template>
-    </Column>
-    <Column field="volBindingMode" header="Vol Binding mode" style="min-width: 12rem">
-        <template #body="{ data }">
-            {{ data.volBindingMode }}
-        </template>
-    </Column>
-    <Column field="allowVolumeExpansion" header="Allow Vol Expansion" style="min-width: 12rem">
-        <template #body="{ data }">
-            {{ data.allowVolumeExpansion }}
+            {{ data.parameters }}
         </template>
     </Column>
     
@@ -58,31 +48,31 @@ import { kubeCmds } from '../../../constants/commands';
 import { MessageTypes } from '@common/messageTypes';
 import TimeAgo from 'javascript-time-ago';
 import { HelperUtils } from '../../../utils/helpers';
-import type { SCListType, SCTableItem } from '@src/types/sc.type';
+import type { IngressClassListType, IngressClassTableItem } from '@src/types/ingressClass.type';
 
 
-const scListData = ref<SCListType| null>(null);
-const scTableData = ref<SCTableItem[]>([]);
+const icListData = ref<IngressClassListType| null>(null);
+const icTableData = ref<IngressClassTableItem[]>([]);
 const loading = ref(true);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
 });
 
-const getScList = () => {
+const getIcList = () => {
     loading.value = true;
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
-        subType: 'scList',
-        command: HelperUtils.prepareCommand(kubeCmds.getScList)
+        subType: 'ingressclassList',
+        command: HelperUtils.prepareCommand(kubeCmds.getIngressClassList)
     });
 }
 
 window.addEventListener('message', (event) => {
     loading.value = false;
-    if(event.data.type == "scList"){
+    if(event.data.type == "ingressclassList"){
         // TODO: Handle error
-        const configDetails = JSON.parse(event.data.data) as SCListType;
+        const configDetails = JSON.parse(event.data.data) as IngressClassListType;
         
         if(configDetails?.items && configDetails?.items?.length > 0){
             const timeAgo = new TimeAgo('en-US');
@@ -92,26 +82,24 @@ window.addEventListener('message', (event) => {
                 
                 return {
                     name: item.metadata?.name,
-                    provisioner: item.provisioner,
-                    reclaimPolicy: item.reclaimPolicy,
-                    volBindingMode: item.volumeBindingMode,
-                    allowVolumeExpansion: item.allowVolumeExpansion ? 'true' : 'false',
+                    controller: item.spec?.controller,
+                    parameters: item.spec?.parameters?.name ?? '',
                     timestamp: timestamp,
                     age: age,
-                } as SCTableItem;
+                } as IngressClassTableItem;
             });
             
-            scTableData.value = [...tData];
-            scListData.value = configDetails;
+            icTableData.value = [...tData];
+            icListData.value = configDetails;
         }else{
-            scTableData.value = [];
-            scListData.value = null;
+            icTableData.value = [];
+            icListData.value = null;
         }
     }
 });
 
 onMounted(() => {
-    getScList();
+    getIcList();
 });
 
 

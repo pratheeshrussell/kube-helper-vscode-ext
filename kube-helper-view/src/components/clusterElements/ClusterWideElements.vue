@@ -6,6 +6,9 @@ import { globalStore } from '../../store/store';
 import PodList from './elementList/PodList.vue';
 import EventList from './elementList/EventList.vue';
 import StorageClassList from './elementList/StorageClassList.vue';
+import ClusterRoleList from './elementList/ClusterRoleList.vue';
+import ClusterRoleBindingList from './elementList/ClusterRoleBindingList.vue';
+import IngressClassList from './elementList/IngressClassList.vue';
 
 const value = ref('0');
 const isContext = ref(false);
@@ -33,9 +36,12 @@ onMounted(() => {
             <TabList>
                 <Tab value="0">Namespaces</Tab>
                 <Tab value="1">Nodes</Tab>
-                <Tab value="2">Storage Classes</Tab>
-                <Tab value="3">Pods</Tab>
-                <Tab value="4">Events</Tab>
+                <Tab value="2">Pods</Tab>
+                <Tab value="3">Cluster Roles</Tab>
+                <Tab value="4">Cluster Role Bindings</Tab>
+                <Tab value="5">Events</Tab>
+                <Tab value="6">Storage Classes</Tab>
+                <Tab value="7">Ingress Classes</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -45,13 +51,22 @@ onMounted(() => {
                     <ClusterNodes />
                 </TabPanel>
                 <TabPanel value="2">
-                    <StorageClassList />
-                </TabPanel>
-                <TabPanel value="3">
                     <PodList />
                 </TabPanel>
+                <TabPanel value="3">
+                    <ClusterRoleList />
+                </TabPanel>
                 <TabPanel value="4">
+                    <ClusterRoleBindingList />
+                </TabPanel>
+                <TabPanel value="5">
                     <EventList />
+                </TabPanel>
+                <TabPanel value="6">
+                    <StorageClassList />
+                </TabPanel>
+                <TabPanel value="7">
+                    <IngressClassList />
                 </TabPanel>
             </TabPanels>
         </Tabs>

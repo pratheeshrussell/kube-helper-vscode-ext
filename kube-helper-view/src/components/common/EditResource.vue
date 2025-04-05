@@ -9,7 +9,6 @@
 import { MessageTypes } from '@common/messageTypes';
 import { HelperUtils } from '@src/utils/helpers';
 
-const editPrefix = 'KUBE_EDITOR="code --wait --new-window --reuse-window" ';
 const inputprops = defineProps({
     editCommand: {
         type: String,
@@ -26,7 +25,7 @@ const sendEditCommand = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_TERMINAL,
         subType: 'runedit',
-        command: editPrefix + HelperUtils.prepareCommand(inputprops.editCommand)
+        command: HelperUtils.prepareCommand(inputprops.editCommand)
     });
 };
 
