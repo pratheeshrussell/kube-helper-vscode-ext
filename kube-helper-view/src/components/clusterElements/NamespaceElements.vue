@@ -15,6 +15,7 @@ import RoleList from './elementList/RoleList.vue';
 import RoleBindingList from './elementList/RoleBindingList.vue';
 import SAList from './elementList/SAList.vue';
 import ReplicaSetList from './elementList/ReplicaSetList.vue';
+import DeploymentList from './elementList/DeploymentList.vue';
 
 const route = useRoute();
 
@@ -67,7 +68,7 @@ onMounted(() => {
                     <ServiceList />
                 </TabPanel>
                 <TabPanel value="deployments">
-                    <p>TO BE DONE</p>
+                    <DeploymentList />
                 </TabPanel>
                 <TabPanel value="replicasets">
                     <ReplicaSetList />

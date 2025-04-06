@@ -15,6 +15,7 @@ import RoleElement from "./components/clusterElements/RoleElement.vue";
 import RoleBindElement from "./components/clusterElements/RoleBindElement.vue";
 import SAElement from "./components/clusterElements/SAElement.vue";
 import ReplsetElement from "./components/clusterElements/ReplsetElement.vue";
+import DeploymentElement from "./components/clusterElements/DeploymentElement.vue";
 const routes:Readonly<RouteRecordRaw[]> = [
     {path:'/sidebar', name:'sidebar', component: Sidebar},
     {path:'/clusterDetails', name:'clusterDetails', component: ClusterView,
@@ -39,6 +40,7 @@ const routes:Readonly<RouteRecordRaw[]> = [
             {path: 'serviceaccount/:saname', name: 'saoverview', component: SAElement},
 
             {path: 'replset/:rsname', name: 'replsetoverview', component: ReplsetElement},
+            {path: 'deployment/:depname', name: 'deploymentoverview', component: DeploymentElement},
             
 
             {path: '', redirect: { name: 'clusteroverview' }},

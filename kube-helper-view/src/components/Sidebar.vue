@@ -65,7 +65,7 @@ onMounted(() => {
                 <template #list="slotProps">
                     <div class="d-flex flex-column">
                         <div v-for="(item, index) in slotProps.items" :key="index">
-                            <div class="d-flex flex-column justify-content-between p-1 m-2" 
+                            <div class="d-flex flex-column justify-content-between context-element p-2 mb-2" 
                             :class="{ 'border-top border-light': index !== 0 }">
                             <div class="d-flex flex-row justify-content-between align-items-center mt-2 mb-1">
                               <div>
@@ -91,6 +91,13 @@ onMounted(() => {
 </template>
 
 <style scoped>
+:deep(.p-dataview-content) {
+    background: transparent;
+}
+.context-element{
+    background: var(--p-dataview-content-background);
+    border-radius: 0.5rem;
+}
 
 
 </style>
