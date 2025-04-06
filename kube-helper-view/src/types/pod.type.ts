@@ -70,7 +70,7 @@ type LabelSelectorRequirement = {
   values?: string[];
 };
 
-type LabelSelector = {
+export type LabelSelector = {
   matchExpressions?: LabelSelectorRequirement[];
   matchLabels?: Record<string, string>;
 };
@@ -830,7 +830,7 @@ type PodResourceClaimStatus = {
   resourceClaimName?: string;
 };
 
-type PodSpec = {
+export type PodSpec = {
   activeDeadlineSeconds?: number;
   affinity?: Affinity;
   automountServiceAccountToken?: boolean;

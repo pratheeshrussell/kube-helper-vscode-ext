@@ -23,12 +23,12 @@
     </Column>
     <Column field="name" header="Name" style="min-width: 12rem">
         <template #body="{ data }">
-            <Button :label="data.name" variant="link" @click="gotoPodDetails(data)" />
+            <Button :label="data.name" class="selectable" variant="link" @click="gotoPodDetails(data)" />
         </template>
     </Column>
     <Column field="owner" header="Owner" style="min-width: 12rem">
         <template #body="{ data }">
-            <span v-if="data.primaryOwner != null" v-tooltip="data.primaryOwner.kind">
+            <span v-if="data.primaryOwner != null" class="selectable" v-tooltip="data.primaryOwner.kind">
                 {{data.primaryOwner.name}}
             </span>
             <span v-else> - </span>

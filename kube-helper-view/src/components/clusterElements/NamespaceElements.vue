@@ -14,11 +14,12 @@ import EndpointList from './elementList/EndpointList.vue';
 import RoleList from './elementList/RoleList.vue';
 import RoleBindingList from './elementList/RoleBindingList.vue';
 import SAList from './elementList/SAList.vue';
+import ReplicaSetList from './elementList/ReplicaSetList.vue';
 
 const route = useRoute();
 
 
-const value = ref('0');
+const value = ref('pods');
 const isNamespace = ref(false);
 
 onMounted(() => {
@@ -43,54 +44,62 @@ onMounted(() => {
     <div class="ns-over-view" v-if="isNamespace">
         <Tabs v-model:value="value" scrollable>
             <TabList>
-                <Tab value="0">Pods</Tab>
-                <Tab value="1">Services</Tab>
-                <Tab value="2">Config Map</Tab>
-                <Tab value="3">Secrets</Tab>
-                <Tab value="4">Persistent Vol</Tab>
-                <Tab value="5">PVC</Tab>
-                <Tab value="6">Ingress</Tab>
-                <Tab value="7">Endpoints</Tab>
-                <Tab value="8">Events</Tab>
-                <Tab value="9">Roles</Tab>
-                <Tab value="10">Role Binding</Tab>
-                <Tab value="11">Service Account</Tab>
+                <Tab value="pods">Pods</Tab>
+                <Tab value="svcs">Services</Tab>
+                <Tab value="replicasets">Replica Sets</Tab>
+                <Tab value="deployments">Deployments</Tab>
+                <Tab value="confmaps">Config Map</Tab>
+                <Tab value="secrets">Secrets</Tab>
+                <Tab value="pv">Persistent Vol</Tab>
+                <Tab value="pvc">PVC</Tab>
+                <Tab value="ingress">Ingress</Tab>
+                <Tab value="endpoints">Endpoints</Tab>
+                <Tab value="events">Events</Tab>
+                <Tab value="roles">Roles</Tab>
+                <Tab value="rolebinding">Role Binding</Tab>
+                <Tab value="sa">Service Account</Tab>
             </TabList>
             <TabPanels>
-                <TabPanel value="0">
+                <TabPanel value="pods">
                    <PodList />
                 </TabPanel>
-                <TabPanel value="1">
+                <TabPanel value="svcs">
                     <ServiceList />
                 </TabPanel>
-                <TabPanel value="2">
+                <TabPanel value="deployments">
+                    <p>TO BE DONE</p>
+                </TabPanel>
+                <TabPanel value="replicasets">
+                    <ReplicaSetList />
+                </TabPanel>
+                <TabPanel value="confmaps">
                     <ConfigMapList />
                 </TabPanel>
-                <TabPanel value="3">
+                <TabPanel value="secrets">
                     <SecretList />
                 </TabPanel>
-                <TabPanel value="4">
+                <TabPanel value="pv">
                     <PVList />
                 </TabPanel>
-                <TabPanel value="5">
+                <TabPanel value="pvc">
                     <PVCList />
                 </TabPanel>
-                <TabPanel value="6">
+                <TabPanel value="ingress">
                     <IngressList />
                 </TabPanel>
-                <TabPanel value="7">
+                <TabPanel value="endpoints">
                     <EndpointList />
                 </TabPanel>
-                <TabPanel value="8">
+                <TabPanel value="events">
                     <EventList />
                 </TabPanel>
-                <TabPanel value="9">
+                <TabPanel value="roles">
                     <RoleList />
                 </TabPanel>
-                <TabPanel value="10">
+                <TabPanel value="rolebinding">
                     <RoleBindingList />
                 </TabPanel>
-                <TabPanel value="11">
+                <TabPanel value="sa">
                     <SAList />
                 </TabPanel>
             </TabPanels>
