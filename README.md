@@ -1,6 +1,6 @@
 # kube-helper
 
-This extension is a wrapper for common kubectl commands. 
+Kube Helper is a wrapper for common kubectl commands that simplifies Kubernetes management by providing quick access to common kubectl commands directly within VSCode.
 
 ## How to install
 Download the vsix file from Releases and run the following command
@@ -15,12 +15,14 @@ code --install-extension  kube-helper-0.0.1.vsix
 
 ## Features
 
-* List Resources like Pods, services in a cluster
-* View logs
+* List Resources like Pods, services, etc., in a cluster
+* Edit definition of resources like pods, deployments from VSCode
+* View logs directly in VSCode
 * Exec into Containers
 * Port forward resources
 
 ![list namespaces](docs/feat_img_1.png)
+![namespace details](docs/feat_img_3.png)
 ![view pod details](docs/feat_img_2.png)
 
 ## Requirements
