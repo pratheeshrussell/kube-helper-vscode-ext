@@ -4,7 +4,6 @@ import { globalStore } from '../../store/store';
 import { useRoute } from 'vue-router';
 import DescribeViewer from '../common/DescribeViewer.vue';
 import { kubeCmds } from '@src/constants/commands';
-import { HelperUtils } from '@src/utils/helpers';
 import ConfigMapData from './elementList/ConfigMapData.vue';
 import EditResource from '../common/EditResource.vue';
 
