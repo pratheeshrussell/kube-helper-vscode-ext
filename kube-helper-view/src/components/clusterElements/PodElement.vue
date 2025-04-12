@@ -35,14 +35,19 @@ onMounted(() => {
         podName.value = name;
         isPodName.value = true;
 
-        podLogsCommand.value = kubeCmds.getLogsPod.replace('{{podname}}', name);
-        podDescribeCommand.value = kubeCmds.getDescribePod.replace('{{podname}}', name);
+        podLogsCommand.value = kubeCmds.getNamespacedResourceLogs
+        .replace("{{resType}}",'pod').replace("{{resName}}",name);
+        podDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'pod')
+        .replace("{{resName}}", name);
 
         podExecCommand.value = kubeCmds.execPod.replace('{{podname}}', name);
         podPortfwdCommand.value = kubeCmds.portfwdPod.replace('{{podname}}', name);
-        podPortDelCommand.value = kubeCmds.deletePod.replace('{{podname}}', name);
+        podPortDelCommand.value = kubeCmds.deleteNamespacedResource.replace("{{resType}}", 'pod')
+        .replace("{{resName}}", name);
 
-        podEditCommand.value = kubeCmds.editPod.replace('{{podname}}', name);
+        podEditCommand.value = kubeCmds.editNamespacedResource.replace("{{resType}}", 'pod')
+        .replace("{{resName}}", name);
 
         podEventCommand.value = kubeCmds.getEventsPerResource
                 .replace('{{resName}}', name).replace('{{resType}}', 'Pod');

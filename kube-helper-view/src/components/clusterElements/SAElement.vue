@@ -25,8 +25,10 @@ onMounted(() => {
         
         isSaName.value = true;
 
-        saDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeSaBind.replace("{{saname}}",saname));
+        saDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'serviceaccounts')
+        .replace("{{resName}}", saname);
+        
 
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,

@@ -25,8 +25,9 @@ onMounted(() => {
         
         isCrbName.value = true;
 
-        crbDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeClusterRoleBind.replace("{{crbname}}",crbname));
+        crbDescribeCommand.value = kubeCmds.
+        describeNonNamespacedResource.replace("{{resType}}", 'clusterrolebinding')
+        .replace("{{resName}}", crbname);
 
         globalStore.breadcrumbItems = [
             {

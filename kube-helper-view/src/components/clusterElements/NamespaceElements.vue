@@ -22,6 +22,9 @@ const route = useRoute();
 const value = ref('pods');
 const isNamespace = ref(false);
 
+const getEventsCmd = kubeCmds.getNamespacedResourceByType.replace("{{resType}}", 'events');
+
+
 onMounted(() => {
     const name = route.params.namespace;
     if(name !== null && typeof name === 'string'){
@@ -87,7 +90,7 @@ onMounted(() => {
                     <EndpointList />
                 </TabPanel>
                 <TabPanel value="events">
-                    <EventList :event-command="kubeCmds.getEvents" />
+                    <EventList :event-command="getEventsCmd" />
                 </TabPanel>
                 <TabPanel value="roles">
                     <RoleList />

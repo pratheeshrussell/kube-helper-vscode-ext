@@ -81,7 +81,9 @@ const getPodDetails = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'getPodByName',
-        command: HelperUtils.prepareCommand(kubeCmds.getPodByName.replace('{{podname}}', podName.value))
+        command: HelperUtils.prepareCommand(
+            kubeCmds.getNamespacedResourceByName.replace("{{resType}}", 'pod')
+            .replace("{{resName}}", podName.value))
     });
 }
 

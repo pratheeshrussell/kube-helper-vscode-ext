@@ -73,7 +73,8 @@ const getSecretList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'secretList',
-        command: HelperUtils.prepareCommand(kubeCmds.getSecretList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'secret'))
     });
 }
 

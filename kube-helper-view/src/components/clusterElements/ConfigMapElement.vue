@@ -27,11 +27,12 @@ onMounted(() => {
         
         isCmName.value = true;
 
-        cmDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeConfigMap.replace("{{cmname}}",cmname));
+        cmDescribeCommand.value = kubeCmds.describeNamespacedResource.replace("{{resType}}", 'configmap')
+            .replace("{{resName}}", cmname);
 
-        cmEditCommand.value = kubeCmds.editConfigMap.replace('{{cmname}}', cmname);
-        
+        cmEditCommand.value = kubeCmds.editNamespacedResource.replace("{{resType}}", 'configmap')
+            .replace("{{resName}}", cmname);
+
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,
             {

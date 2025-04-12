@@ -64,7 +64,8 @@ const getIcList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'ingressclassList',
-        command: HelperUtils.prepareCommand(kubeCmds.getIngressClassList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNonNamespacedResourceByType.replace("{{resType}}", 'ingressclass'))
     });
 }
 

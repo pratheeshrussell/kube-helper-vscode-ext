@@ -69,7 +69,8 @@ const getEndpointList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'endpointList',
-        command: HelperUtils.prepareCommand(kubeCmds.getEndpointList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'endpoints'))
     });
 }
 

@@ -86,7 +86,8 @@ const getPodList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'podList',
-        command: HelperUtils.prepareCommand(kubeCmds.getPodList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'pod'))
     });
 }
 

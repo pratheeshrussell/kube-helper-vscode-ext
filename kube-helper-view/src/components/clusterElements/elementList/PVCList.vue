@@ -93,7 +93,8 @@ const getPvcList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'pvcList',
-        command: HelperUtils.prepareCommand(kubeCmds.getPvcList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'pvc'))
     });
 }
 

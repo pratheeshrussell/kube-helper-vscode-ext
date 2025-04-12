@@ -92,7 +92,8 @@ const getSvcList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'svcList',
-        command: HelperUtils.prepareCommand(kubeCmds.getServiceList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'service'))
     });
 }
 

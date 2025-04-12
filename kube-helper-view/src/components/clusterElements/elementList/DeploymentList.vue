@@ -97,7 +97,8 @@ const getDeploymentList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'deploymentList',
-        command: HelperUtils.prepareCommand(kubeCmds.getDeploymentList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'deploy'))
     });
 }
 

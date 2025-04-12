@@ -31,12 +31,18 @@ onMounted(() => {
         
         isDepName.value = true;
 
-        depDescribeCommand.value = kubeCmds.getDescribeDeployment.replace("{{depname}}",depname);
+        depDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'deployment')
+        .replace("{{resName}}", depname);
 
-        depLogCommand.value = kubeCmds.getLogsDeployment.replace("{{depname}}",depname);
+        depLogCommand.value = kubeCmds.getNamespacedResourceLogs
+        .replace("{{resType}}",'deployment').replace("{{resName}}",depname);
 
-        depEditCommand.value = kubeCmds.editDeployment.replace('{{depname}}', depname);
-        depDelCommand.value = kubeCmds.deleteDeployment.replace('{{depname}}', depname);
+        depEditCommand.value = kubeCmds.editNamespacedResource.replace("{{resType}}", 'deployment')
+        .replace("{{resName}}", depname);
+        
+        depDelCommand.value = kubeCmds.deleteNamespacedResource.replace("{{resType}}", 'deployment')
+        .replace("{{resName}}", depname);
 
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,

@@ -69,7 +69,8 @@ const getNodeDetails = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'clusterNodeDetails',
-        command: HelperUtils.prepareCommand(kubeCmds.getClusterNodes)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNonNamespacedResourceByType.replace("{{resType}}", 'nodes'))
     });
 }
 

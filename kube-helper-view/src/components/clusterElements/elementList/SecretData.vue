@@ -60,8 +60,9 @@ const getSecretData = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'secretData',
-        command: HelperUtils.prepareCommand(kubeCmds.getSecretByName
-        .replace("{{secretname}}", secretName.value)),
+        command: HelperUtils.prepareCommand(
+            kubeCmds.getNamespacedResourceByName.replace("{{resType}}", 'secret')
+            .replace("{{resName}}", secretName.value)),
     });
 }
 

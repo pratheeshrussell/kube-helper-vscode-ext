@@ -61,8 +61,8 @@ const getCmData = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'cmData',
-        command: HelperUtils.prepareCommand(kubeCmds.getConfigMapByName
-        .replace("{{cmname}}", cmName.value)),
+        command: HelperUtils.prepareCommand(kubeCmds.getNamespacedResourceByName
+        .replace("{{resType}}", 'configmap').replace("{{resName}}", cmName.value)),
     });
 }
 

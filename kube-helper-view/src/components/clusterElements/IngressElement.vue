@@ -27,10 +27,12 @@ onMounted(() => {
         
         isIngressName.value = true;
 
-        ingressDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeIngress.replace("{{ingressname}}",ingressname));
+        ingressDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'ingress')
+        .replace("{{resName}}", ingressname);
 
-        ingressEditCommand.value = kubeCmds.editIngress.replace('{{ingressname}}', ingressname);
+        ingressEditCommand.value = kubeCmds.editNamespacedResource.replace("{{resType}}", 'ingress')
+        .replace("{{resName}}", ingressname);
         
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,

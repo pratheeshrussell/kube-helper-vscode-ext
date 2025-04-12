@@ -104,7 +104,8 @@ const getPvList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'pvList',
-        command: HelperUtils.prepareCommand(kubeCmds.getPvList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNonNamespacedResourceByType.replace("{{resType}}", 'pv'))
     });
 }
 

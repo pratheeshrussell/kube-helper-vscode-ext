@@ -59,7 +59,8 @@ const getRoleList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'roleList',
-        command: HelperUtils.prepareCommand(kubeCmds.getRoleList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'roles'))
     });
 }
 

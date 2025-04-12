@@ -96,7 +96,8 @@ const getReplicaSetList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'replicasetList',
-        command: HelperUtils.prepareCommand(kubeCmds.getReplSetList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'replicaset'))
     });
 }
 

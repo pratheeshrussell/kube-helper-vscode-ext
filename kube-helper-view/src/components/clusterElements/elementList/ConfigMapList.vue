@@ -66,7 +66,8 @@ const getConfigMapList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'configmapList',
-        command: HelperUtils.prepareCommand(kubeCmds.getConfigMap)
+        command: HelperUtils.prepareCommand(kubeCmds.getNamespacedResourceByType
+        .replace("{{resType}}", 'configmap'))
     });
 }
 

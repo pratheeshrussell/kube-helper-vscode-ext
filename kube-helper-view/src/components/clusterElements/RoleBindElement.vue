@@ -25,8 +25,9 @@ onMounted(() => {
         
         isRbName.value = true;
 
-        rbDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeRoleBind.replace("{{rbname}}",rbname));
+        rbDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'rolebindings')
+        .replace("{{resName}}", rbname);
 
         globalStore.breadcrumbItems = [
         ...globalStore.breadcrumbItems,

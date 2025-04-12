@@ -74,7 +74,8 @@ const getScList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'scList',
-        command: HelperUtils.prepareCommand(kubeCmds.getScList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNonNamespacedResourceByType.replace("{{resType}}", 'sc'))
     });
 }
 

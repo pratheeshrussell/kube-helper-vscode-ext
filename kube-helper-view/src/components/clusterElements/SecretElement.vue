@@ -28,10 +28,12 @@ onMounted(() => {
         
         isSecretName.value = true;
 
-        secretDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeSecret.replace("{{secretname}}",secretname));
+        secretDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'secret')
+        .replace("{{resName}}", secretname);;
 
-        secretEditCommand.value = kubeCmds.editSecret.replace('{{secretname}}', secretname);
+        secretEditCommand.value = kubeCmds.editNamespacedResource.replace("{{resType}}", 'secret')
+        .replace("{{resName}}", secretname);
         
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,

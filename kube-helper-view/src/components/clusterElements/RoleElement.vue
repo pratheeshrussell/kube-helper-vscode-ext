@@ -25,8 +25,9 @@ onMounted(() => {
         
         isRoleName.value = true;
 
-        roleDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeRole.replace("{{rolename}}",rolename));
+        roleDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'roles')
+        .replace("{{resName}}", rolename);
 
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,

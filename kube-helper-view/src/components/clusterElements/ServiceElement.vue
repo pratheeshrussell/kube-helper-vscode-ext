@@ -28,13 +28,15 @@ onMounted(() => {
         
         isSvcName.value = true;
 
-        svcDescribeCommand.value = HelperUtils.prepareCommand(
-        kubeCmds.getDescribeSvc.replace("{{svcname}}",svcname));
+        svcDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'svc')
+        .replace("{{resName}}", svcname);;
 
         svcPortfwdCommand.value = HelperUtils.prepareCommand(
         kubeCmds.portfwdSvc.replace("{{svcname}}",svcname));
 
-        svcEditCommand.value = kubeCmds.editSvc.replace("{{svcname}}",svcname);
+        svcEditCommand.value = kubeCmds.editNamespacedResource.replace("{{resType}}", 'service')
+        .replace("{{resName}}", svcname);
         
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,

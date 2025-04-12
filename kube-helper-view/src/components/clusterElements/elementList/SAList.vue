@@ -75,7 +75,8 @@ const getSaList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'saList',
-        command: HelperUtils.prepareCommand(kubeCmds.getServiceAccountList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'serviceaccounts'))
     });
 }
 

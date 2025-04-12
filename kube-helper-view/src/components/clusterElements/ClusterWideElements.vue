@@ -15,6 +15,9 @@ import { kubeCmds } from '@src/constants/commands';
 const value = ref('ns');
 const isContext = ref(false);
 
+const getEventsCmd = kubeCmds.getNamespacedResourceByType.replace("{{resType}}", 'events');
+
+
 onMounted(() => {
     const body=document.getElementsByTagName('body')[0];
     if(body){
@@ -66,7 +69,7 @@ onMounted(() => {
                     <ClusterRoleBindingList />
                 </TabPanel>
                 <TabPanel value="event">
-                    <EventList :event-command="kubeCmds.getEvents" />
+                    <EventList :event-command="getEventsCmd" />
                 </TabPanel>
                 <TabPanel value="sc">
                     <StorageClassList />

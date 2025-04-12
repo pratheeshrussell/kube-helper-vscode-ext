@@ -54,7 +54,8 @@ const getClusterRoleList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'clusterRoleList',
-        command: HelperUtils.prepareCommand(kubeCmds.getClusterRoleList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNonNamespacedResourceByType.replace("{{resType}}", 'clusterroles'))
     });
 }
 

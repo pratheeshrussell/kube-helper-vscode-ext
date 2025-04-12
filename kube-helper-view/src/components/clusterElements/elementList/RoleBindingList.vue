@@ -77,7 +77,8 @@ const getRoleBindList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'roleBindingList',
-        command: HelperUtils.prepareCommand(kubeCmds.getRoleBindingList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'rolebindings'))
     });
 }
 

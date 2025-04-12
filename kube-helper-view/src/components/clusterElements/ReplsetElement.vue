@@ -38,10 +38,16 @@ onMounted(() => {
         
         isRsName.value = true;
 
-        rsDescribeCommand.value = kubeCmds.getDescribeReplsetBind.replace("{{rsname}}",rsname);
-        rsEditCommand.value = kubeCmds.editReplicaset.replace('{{rsname}}', rsname);
-        rsDelCommand.value = kubeCmds.deleteRepSet.replace('{{rsname}}', rsname);
-        rsLogCommand.value = kubeCmds.getLogsReplSet.replace('{{rsname}}', rsname);
+        rsDescribeCommand.value = kubeCmds.describeNamespacedResource
+        .replace("{{resType}}", 'replicaset')
+        .replace("{{resName}}", rsname);
+        
+        rsEditCommand.value = kubeCmds.editNamespacedResource.replace("{{resType}}", 'replicaset')
+        .replace("{{resName}}", rsname);
+        rsDelCommand.value = kubeCmds.deleteNamespacedResource.replace("{{resType}}", 'replicaset')
+        .replace("{{resName}}", rsname);
+        rsLogCommand.value = kubeCmds.getNamespacedResourceLogs
+        .replace("{{resType}}",'rs').replace("{{resName}}",rsname);
 
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,

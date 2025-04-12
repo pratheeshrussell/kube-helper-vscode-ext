@@ -84,7 +84,8 @@ const getIngressList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'ingressList',
-        command: HelperUtils.prepareCommand(kubeCmds.getIngressList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNamespacedResourceByType.replace("{{resType}}", 'ingress'))
     });
 }
 

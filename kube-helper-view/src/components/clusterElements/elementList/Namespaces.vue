@@ -59,7 +59,8 @@ const getNamespacesDetails = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'namespaceDetails',
-        command: HelperUtils.prepareCommand(kubeCmds.getNamespaces)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNonNamespacedResourceByType.replace("{{resType}}", 'namespaces'))
     });
 }
 

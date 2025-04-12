@@ -71,7 +71,8 @@ const getClusterRoleBindList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'clusterRoleBindingList',
-        command: HelperUtils.prepareCommand(kubeCmds.getClusterRoleBindingList)
+        command: HelperUtils.prepareCommand(kubeCmds
+        .getNonNamespacedResourceByType.replace("{{resType}}", 'clusterrolebindings'))
     });
 }
 
