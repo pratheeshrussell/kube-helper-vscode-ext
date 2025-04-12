@@ -10,10 +10,9 @@ If you find this extension helpful (or just want to support the idea), giving th
 
 
 ## How to install
-Download the vsix file from Releases and run the following command
+Download the vsix file from Releases [![Install Extension](https://img.shields.io/badge/Install-Download%20VSIX-blue?logo=visualstudiocode&logoColor=white)](https://github.com/pratheeshrussell/kube-helper-vscode-ext/releases)
 
-[![Install Extension](https://img.shields.io/badge/Install-Download%20VSIX-blue?logo=visualstudiocode&logoColor=white)](https://github.com/pratheeshrussell/kube-helper-vscode-ext/releases)
-
+Run the following command to install the downloaded vsix file
 ```sh
 code --install-extension  kube-helper-<version>.vsix
 
