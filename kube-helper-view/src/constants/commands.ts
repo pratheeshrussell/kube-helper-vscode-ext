@@ -12,6 +12,7 @@ export const kubeCmds = {
     getPvcList: "kubectl get pvc {{namespace}} {{context}} -o json",
 
     getEvents: "kubectl get events {{namespace}} {{context}} -o json",
+    getEventsPerResource: "kubectl get events --field-selector involvedObject.kind={{resType}},involvedObject.name={{resName}} {{namespace}} {{context}} -o json",
     getConfigMap: "kubectl get configmap {{namespace}} {{context}} -o json",
     getConfigMapByName: "kubectl get configmap {{cmname}} {{namespace}} {{context}} -o json",
     getSecretList: "kubectl get secret {{namespace}} {{context}} -o json",
@@ -33,7 +34,8 @@ export const kubeCmds = {
 
     getLogsPod: "kubectl logs {{podname}} {{namespace}} {{context}}",
     getLogsContainer: "kubectl logs {{podname}} -c {{container}} {{namespace}} {{context}}",
-    
+    getLogsReplSet: "kubectl logs rs/{{rsname}} {{namespace}} {{context}}",
+    getLogsDeployment: "kubectl logs deployment/{{depname}} {{namespace}} {{context}}",
 
     getDescribePod: "kubectl describe pod {{podname}} {{namespace}} {{context}}",
     getDescribeSvc: "kubectl describe service {{svcname}} {{namespace}} {{context}}",
@@ -55,9 +57,14 @@ export const kubeCmds = {
     portfwdSvc: "kubectl port-forward svc/{{svcname}} {{portmapping}} {{namespace}} {{context}}",
 
     deletePod: "kubectl delete pod {{podname}} {{namespace}} {{context}}",
+    deleteRepSet: "kubectl delete rs {{rsname}} {{namespace}} {{context}}",
+    deleteDeployment: "kubectl delete deployment {{depname}} {{namespace}} {{context}}",
+
     editPod: "kubectl edit pod {{podname}} {{namespace}} {{context}}",
     editSvc: "kubectl edit svc {{svcname}} {{namespace}} {{context}}",
     editSecret: "kubectl edit secret {{secretname}} {{namespace}} {{context}}",
     editConfigMap: "kubectl edit configmap {{cmname}} {{namespace}} {{context}}",
     editIngress: "kubectl edit ingress {{ingressname}} {{namespace}} {{context}}",
+    editReplicaset: "kubectl edit replicaset {{rsname}} {{namespace}} {{context}}",
+    editDeployment: "kubectl edit deployment {{depname}} {{namespace}} {{context}}",
 } as const;

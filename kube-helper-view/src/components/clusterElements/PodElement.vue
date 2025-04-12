@@ -10,6 +10,7 @@ import RunExec from '../common/RunExec.vue';
 import PortForward from '../common/PortForward.vue';
 import DeleteResource from '../common/DeleteResource.vue';
 import EditResource from '../common/EditResource.vue';
+import EventList from '../common/EventList.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -25,6 +26,7 @@ const podExecCommand = ref('');
 const podPortfwdCommand = ref('');
 const podPortDelCommand = ref('');
 const podEditCommand = ref('');
+const podEventCommand = ref('');
 
 onMounted(() => {
     const name = route.params.podname;
@@ -41,6 +43,9 @@ onMounted(() => {
         podPortDelCommand.value = kubeCmds.deletePod.replace('{{podname}}', name);
 
         podEditCommand.value = kubeCmds.editPod.replace('{{podname}}', name);
+
+        podEventCommand.value = kubeCmds.getEventsPerResource
+                .replace('{{resName}}', name).replace('{{resType}}', 'Pod');
 
         const lastBreadcrumb = globalStore.breadcrumbItems[globalStore.breadcrumbItems.length - 1];
         if (!lastBreadcrumb ||
@@ -85,6 +90,7 @@ const handlePodDelete = () => {
                 <Tab value="0">Containers</Tab>
                 <Tab value="1">Logs</Tab>
                 <Tab value="2">Describe</Tab>
+                <Tab value="events">Events</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -95,6 +101,9 @@ const handlePodDelete = () => {
                 </TabPanel>
                 <TabPanel value="2">
                     <DescribeViewer :describeCommand="podDescribeCommand" />
+                </TabPanel>
+                <TabPanel value="events">
+                    <EventList :event-command="podEventCommand" />
                 </TabPanel>
             </TabPanels>
         </Tabs>

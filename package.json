@@ -5,7 +5,7 @@
   "publisher": "PratheeshRussell",
   "repository": "https://github.com/pratheeshrussell/kube-helper-vscode-ext",
   "icon": "assets/images/kube-helper.png",
-  "version": "0.0.1-test.5",
+  "version": "0.0.1-test.6",
   "engines": {
     "vscode": "^1.96.0"
   },

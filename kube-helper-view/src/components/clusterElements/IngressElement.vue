@@ -47,12 +47,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="svc-over-view" v-if="!isIngressName">
+    <div class="ing-over-view" v-if="!isIngressName">
         <div>Unable to load ingress details</div>
     </div>
-    <div class="svc-over-view" v-if="isIngressName">
-        <div class="d-flex flex-row-reverse p-2 secret-options">
-            <EditResource :editCommand="ingressEditCommand" buttonText="Edit Secret" />
+    <div class="ing-over-view" v-if="isIngressName">
+        <div class="d-flex flex-row-reverse p-2 ingress-options">
+            <EditResource :editCommand="ingressEditCommand" buttonText="Edit Ingress" />
         </div>
         <Tabs v-model:value="value" scrollable>
             <TabList>
@@ -70,7 +70,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.secret-options{
+.ingress-options{
     background-color: var(--p-surface-900);
 }
 

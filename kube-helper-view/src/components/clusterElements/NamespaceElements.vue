@@ -4,10 +4,9 @@ import PodList from './elementList/PodList.vue';
 import { globalStore } from '../../store/store';
 import { useRoute } from 'vue-router'
 import ServiceList from './elementList/ServiceList.vue';
-import EventList from './elementList/EventList.vue';
+import EventList from '../common/EventList.vue';
 import ConfigMapList from './elementList/ConfigMapList.vue';
 import SecretList from './elementList/SecretList.vue';
-import PVList from './elementList/PVList.vue';
 import PVCList from './elementList/PVCList.vue';
 import IngressList from './elementList/IngressList.vue';
 import EndpointList from './elementList/EndpointList.vue';
@@ -16,9 +15,9 @@ import RoleBindingList from './elementList/RoleBindingList.vue';
 import SAList from './elementList/SAList.vue';
 import ReplicaSetList from './elementList/ReplicaSetList.vue';
 import DeploymentList from './elementList/DeploymentList.vue';
+import { kubeCmds } from '@src/constants/commands';
 
 const route = useRoute();
-
 
 const value = ref('pods');
 const isNamespace = ref(false);
@@ -51,7 +50,6 @@ onMounted(() => {
                 <Tab value="deployments">Deployments</Tab>
                 <Tab value="confmaps">Config Map</Tab>
                 <Tab value="secrets">Secrets</Tab>
-                <Tab value="pv">Persistent Vol</Tab>
                 <Tab value="pvc">PVC</Tab>
                 <Tab value="ingress">Ingress</Tab>
                 <Tab value="endpoints">Endpoints</Tab>
@@ -79,9 +77,6 @@ onMounted(() => {
                 <TabPanel value="secrets">
                     <SecretList />
                 </TabPanel>
-                <TabPanel value="pv">
-                    <PVList />
-                </TabPanel>
                 <TabPanel value="pvc">
                     <PVCList />
                 </TabPanel>
@@ -92,7 +87,7 @@ onMounted(() => {
                     <EndpointList />
                 </TabPanel>
                 <TabPanel value="events">
-                    <EventList />
+                    <EventList :event-command="kubeCmds.getEvents" />
                 </TabPanel>
                 <TabPanel value="roles">
                     <RoleList />

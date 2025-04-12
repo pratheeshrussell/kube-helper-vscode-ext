@@ -4,13 +4,15 @@ import Namespaces from './elementList/Namespaces.vue';
 import ClusterNodes from './elementList/ClusterNodes.vue';
 import { globalStore } from '../../store/store';
 import PodList from './elementList/PodList.vue';
-import EventList from './elementList/EventList.vue';
+import PVList from './elementList/PVList.vue';
+import EventList from '../common/EventList.vue';
 import StorageClassList from './elementList/StorageClassList.vue';
 import ClusterRoleList from './elementList/ClusterRoleList.vue';
 import ClusterRoleBindingList from './elementList/ClusterRoleBindingList.vue';
 import IngressClassList from './elementList/IngressClassList.vue';
+import { kubeCmds } from '@src/constants/commands';
 
-const value = ref('0');
+const value = ref('ns');
 const isContext = ref(false);
 
 onMounted(() => {
@@ -34,38 +36,42 @@ onMounted(() => {
     <div class="cluster-over-view" v-if="isContext">
         <Tabs v-model:value="value" scrollable>
             <TabList>
-                <Tab value="0">Namespaces</Tab>
-                <Tab value="1">Nodes</Tab>
-                <Tab value="2">Pods</Tab>
-                <Tab value="3">Cluster Roles</Tab>
-                <Tab value="4">Cluster Role Bindings</Tab>
-                <Tab value="5">Events</Tab>
-                <Tab value="6">Storage Classes</Tab>
-                <Tab value="7">Ingress Classes</Tab>
+                <Tab value="ns">Namespaces</Tab>
+                <Tab value="nodes">Nodes</Tab>
+                <Tab value="pods">Pods</Tab>
+                <Tab value="pv">Persistent Vol</Tab>
+                <Tab value="event">Events</Tab>
+                <Tab value="cr">Cluster Roles</Tab>
+                <Tab value="crb">Cluster Role Bindings</Tab>
+                <Tab value="sc">Storage Classes</Tab>
+                <Tab value="ic">Ingress Classes</Tab>
             </TabList>
             <TabPanels>
-                <TabPanel value="0">
+                <TabPanel value="ns">
                    <Namespaces />
                 </TabPanel>
-                <TabPanel value="1">
+                <TabPanel value="nodes">
                     <ClusterNodes />
                 </TabPanel>
-                <TabPanel value="2">
+                <TabPanel value="pods">
                     <PodList />
                 </TabPanel>
-                <TabPanel value="3">
+                <TabPanel value="pv">
+                    <PVList />
+                </TabPanel>
+                <TabPanel value="cr">
                     <ClusterRoleList />
                 </TabPanel>
-                <TabPanel value="4">
+                <TabPanel value="crb">
                     <ClusterRoleBindingList />
                 </TabPanel>
-                <TabPanel value="5">
-                    <EventList />
+                <TabPanel value="event">
+                    <EventList :event-command="kubeCmds.getEvents" />
                 </TabPanel>
-                <TabPanel value="6">
+                <TabPanel value="sc">
                     <StorageClassList />
                 </TabPanel>
-                <TabPanel value="7">
+                <TabPanel value="ic">
                     <IngressClassList />
                 </TabPanel>
             </TabPanels>

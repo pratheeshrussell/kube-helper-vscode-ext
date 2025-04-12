@@ -7,8 +7,8 @@
                 <InputText v-model="searchTerm" placeholder="Find" />
             </IconField>
             <div class="d-flex align-items-center">
-                <span class="d-flex me-2">
-                    <Checkbox v-if="allowPrevious" v-model="addPrevOption" 
+                <span class="d-flex me-2" v-if="allowPrevious">
+                    <Checkbox  v-model="addPrevOption" 
                     inputId="log-prev" binary />
                     <label for="log-prev" class="mx-1"> Previous </label>
                 </span>

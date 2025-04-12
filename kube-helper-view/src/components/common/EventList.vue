@@ -52,15 +52,19 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
-import { kubeCmds } from '../../../constants/commands';
 import { MessageTypes } from '@common/messageTypes';
 import TimeAgo from 'javascript-time-ago';
-import { HelperUtils } from '../../../utils/helpers';
-import { globalStore } from '../../../store/store';
+import { HelperUtils } from '../../utils/helpers';
+import { globalStore } from '../../store/store';
 import { useRouter } from 'vue-router';
 import type { EventListType, EventTableItem, EventType } from '@src/types/event.type';
 
-
+const inputprops = defineProps({
+    eventCommand: {
+        type: String,
+        required: true
+    }
+});
 
 const eventListData = ref<EventListType| null>(null);
 const eventTableData = ref<EventTableItem[]>([]);
@@ -77,7 +81,7 @@ const getEventList = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'eventList',
-        command: HelperUtils.prepareCommand(kubeCmds.getEvents)
+        command: HelperUtils.prepareCommand(inputprops.eventCommand)
     });
 }
 
