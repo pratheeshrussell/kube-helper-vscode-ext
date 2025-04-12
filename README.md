@@ -9,7 +9,7 @@ If you find this extension helpful (or just want to support the idea), giving th
 [![Star on GitHub](https://img.shields.io/github/stars/pratheeshrussell/kube-helper-vscode-ext?style=social)](https://github.com/pratheeshrussell/kube-helper-vscode-ext)
 
 
-## How to install
+## 📦 How to install
 Download the vsix file from Releases [![Install Extension](https://img.shields.io/badge/Install-Download%20VSIX-blue?logo=visualstudiocode&logoColor=white)](https://github.com/pratheeshrussell/kube-helper-vscode-ext/releases)
 
 Run the following command to install the downloaded vsix file
@@ -21,7 +21,7 @@ code --install-extension  kube-helper-0.0.1.vsix
 ```
 
 
-## Features
+## ✨ Features
 
 * List Resources like Pods, services, etc., in a cluster
 * Edit definition of resources like pods, deployments from VSCode
@@ -33,19 +33,19 @@ code --install-extension  kube-helper-0.0.1.vsix
 ![namespace details](docs/feat_img_3.png)
 ![view pod details](docs/feat_img_2.png)
 
-## Requirements
+## 🛠 Requirements
 
 This extension depends on the kubectl CLI. Make sure it's installed and accessible in your system's PATH.
 
-## Extension Settings
+## ⚙️ Extension Settings
 
 Click on the side bar icon to activate the extension
 
-## Known Issues
+## 🐞 Known Issues
 
 * Doesn't support all Kubernetes resource types yet.   
 Feel free to open a [feature request](https://github.com/pratheeshrussell/kube-helper-vscode-ext/issues/new?template=2-feature-req.yml) if you'd like support for something specific
 
 
-## Credits
+## 🙏 Credits
 Icons by [icons8.com](https://icons8.com)
