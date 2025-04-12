@@ -2,8 +2,17 @@
 
 Kube Helper is a wrapper for common kubectl commands that simplifies Kubernetes management by providing quick access to common kubectl commands directly within VSCode.
 
+## 🙌 Support This Project
+
+If you find this extension helpful (or just want to support the idea), giving the repo a ⭐ would mean a lot!
+
+[![Star on GitHub](https://img.shields.io/github/stars/pratheeshrussell/kube-helper-vscode-ext?style=social)](https://github.com/pratheeshrussell/kube-helper-vscode-ext)
+
+
 ## How to install
 Download the vsix file from Releases and run the following command
+
+[![Install Extension](https://img.shields.io/badge/Install-Download%20VSIX-blue?logo=visualstudiocode&logoColor=white)](https://github.com/pratheeshrussell/kube-helper-vscode-ext/releases)
 
 ```sh
 code --install-extension  kube-helper-<version>.vsix
@@ -27,7 +36,7 @@ code --install-extension  kube-helper-0.0.1.vsix
 
 ## Requirements
 
-This extension depends on kubectl cli. Make sure it is accessible.
+This extension depends on the kubectl CLI. Make sure it's installed and accessible in your system's PATH.
 
 ## Extension Settings
 
@@ -35,7 +44,8 @@ Click on the side bar icon to activate the extension
 
 ## Known Issues
 
-* Doesn't support all resources. Raise a feature request ticket if you are in need of something
+* Doesn't support all Kubernetes resource types yet.   
+Feel free to open a [feature request](https://github.com/pratheeshrussell/kube-helper-vscode-ext/issues/new?template=2-feature-req.yml) if you'd like support for something specific
 
 
 ## Credits
