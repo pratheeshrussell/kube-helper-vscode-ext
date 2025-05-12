@@ -27,8 +27,8 @@
         </template>
     </Column>
     <template #expansion="slotProps">
-        <div>
-            {{ slotProps.data.value }}
+        <div class="selectable">
+            {{ (slotProps.data.decodedValue && slotProps.data.decodedValue != '') ? slotProps.data.decodedValue : slotProps.data.value }}
         </div>
     </template>
     </DataTable>
@@ -71,12 +71,21 @@ window.addEventListener('message', (event) => {
     if(event.data.type == "secretData"){
         
         // TODO: Handle error
+        const decodeBase64 = (datastr: string) => {
+            try {
+                return atob(datastr);
+            } catch (_e) {
+                return '';
+            }
+        }
         const configDetails = JSON.parse(event.data.data) as SecretType;
         if(configDetails?.data && Object.keys(configDetails.data).length > 0){
             const tData = Object.entries(configDetails.data).map(([key, value]) => {
+                const decodedValue = decodeBase64(value);
                 return {
                     key: key,
                     value: value,
+                    decodedValue: decodedValue
                 } as SecretDataTableItem;
             });
             secretTableData.value = [...tData];
