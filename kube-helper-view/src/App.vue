@@ -2,7 +2,6 @@
 import { onMounted } from 'vue';
 import { ThemeManager } from './utils/themeManager';
 import { useRouter } from 'vue-router';
-import Toast from 'primevue/toast';
 
 const router = useRouter();
 window.addEventListener('message', (event) => {
@@ -23,7 +22,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <Toast />
   <RouterView />
 </template>
 

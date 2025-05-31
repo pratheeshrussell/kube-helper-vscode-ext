@@ -9,19 +9,14 @@
 
             <RefreshData :reloadFunction="getLogs" />
     </div>
-    <Message v-if="describeErrorMessage" severity="error" :closable="false" class="mb-2">{{ describeErrorMessage }}</Message>
     <div v-if="!loading">
-        <v-ace-editor v-if="!describeErrorMessage" v-model:value="logData" readonly @init="editorInit" lang="text" theme="cloud_editor_dark"
+        <v-ace-editor v-model:value="logData" readonly @init="editorInit" lang="text" theme="cloud_editor_dark"
             style="height: 300px" />
-        <div v-else class="p-3 border rounded bg-surface-100 text-muted" style="height: 300px; overflow-y: auto;">
-            Error loading describe output. See message above.
-        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import Message from 'primevue/message'; // Import Message
 import ace from 'ace-builds';
 import { MessageTypes } from '@common/messageTypes';
 import { HelperUtils } from '@src/utils/helpers';
@@ -38,13 +33,10 @@ const loading = ref(true);
 const searchTerm = ref('');
 
 const logData = ref('');
-const describeErrorMessage = ref<string | null>(null);
 const editor = ref<ace.Editor | null>(null);
 
-const getLogs = () => { // Consider renaming to getDescribeData for clarity
+const getLogs = () => {
     loading.value = true;
-    describeErrorMessage.value = null;
-    logData.value = ''; // Clear previous data
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'getDescribe',
@@ -136,23 +128,19 @@ function handleSearch(searchTerm: string) {
 
 window.addEventListener('message', (event) => {
     if (event.data.type == "getDescribe") {
-        loading.value = false;
-        describeErrorMessage.value = null;
         if (event.data.data) {
             if (event.data?.data?.error) {
-                describeErrorMessage.value = `Failed to fetch describe output: ${event.data.data.errormessage || 'Unknown error'}. ${event.data.data.output || ''}`.trim();
-                logData.value = ''; // Ensure editor is cleared
+                logData.value = event.data?.data?.errormessage +
+                    '\n' + event.data?.data?.output;
             } else {
                 logData.value = event.data.data;
             }
-        } else {
-            describeErrorMessage.value = "Received empty data for describe output.";
-            logData.value = '';
         }
     }
+    loading.value = false;
 });
 
 onMounted(() => {
-    getLogs(); // This will also reset describeErrorMessage
+    getLogs();
 });
 </script>

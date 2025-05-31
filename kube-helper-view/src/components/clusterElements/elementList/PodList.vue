@@ -1,5 +1,4 @@
 <template>
-    <Message v-if="errorMessage" severity="error" :closable="true" @close="errorMessage = null">{{ errorMessage }}</Message>
     <DataTable :value="podTableData" v-model:filters="filters"
     paginator :rows="5" dataKey="name" filterDisplay="row" :loading="loading">
     <template #header>
@@ -57,20 +56,11 @@
         </template>
     </Column>
 
-    <Column header="Actions" style="min-width: 10rem">
-        <template #body="{ data }">
-            <SplitButton :model="getPodActions(data)" label="View Details"
-                         @click="gotoPodDetails(data)"
-                         class="p-button-sm" />
-        </template>
-    </Column>
-
     </DataTable>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import type { MenuItem } from 'primevue/menuitem';
 import { FilterMatchMode } from '@primevue/core/api';
 import { kubeCmds } from '../../../constants/commands';
 import { MessageTypes } from '@common/messageTypes';
@@ -84,7 +74,6 @@ import type { PodListType, PodTableItem } from '@src/types/podList.type';
 const podListData = ref<PodListType| null>(null);
 const podTableData = ref<PodTableItem[]>([]);
 const loading = ref(true);
-const errorMessage = ref<string | null>(null);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -94,7 +83,6 @@ const router = useRouter();
 
 const getPodList = () => {
     loading.value = true;
-    errorMessage.value = null;
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'podList',
@@ -118,104 +106,16 @@ const gotoPodDetails = (data: PodTableItem) => {
     router.push({name: 'podoverview', params: {podname: data.name}});
 }
 
-const gotoPodLogs = (data: PodTableItem) => {
-    if(globalStore.namespace === null){
-        globalStore.namespace = data.namespace;
-        globalStore.breadcrumbItems = [
-            {label: data.namespace, params:{namespace: data.namespace}
-                , navigateTo: 'namespaceoverview', index: 0}
-        ];
-    }
-    router.push({name: 'podoverview', params: {podname: data.name}, query: { tab: '1' }}); // '1' for Logs tab
-}
-
-const gotoPodExec = (data: PodTableItem) => {
-    // For now, navigates to details view where exec options are.
-    // Future: could pass a query param like ?tab=exec if there's a dedicated exec tab/section.
-    if(globalStore.namespace === null){
-        globalStore.namespace = data.namespace;
-        globalStore.breadcrumbItems = [
-            {label: data.namespace, params:{namespace: data.namespace}
-                , navigateTo: 'namespaceoverview', index: 0}
-        ];
-    }
-    // Assuming Exec options are available on the pod overview page, no specific tab query needed for now.
-    // PodElement.vue already shows RunExec at the top.
-    router.push({name: 'podoverview', params: {podname: data.name}});
-}
-
-const gotoPodEdit = (data: PodTableItem) => {
-    // For now, navigates to details view where edit options are.
-    // PodElement.vue already shows EditResource at the top.
-    // Future: could pass a query param like ?tab=edit if there's a dedicated edit tab/section.
-    if(globalStore.namespace === null){
-        globalStore.namespace = data.namespace;
-        globalStore.breadcrumbItems = [
-            {label: data.namespace, params:{namespace: data.namespace}
-                , navigateTo: 'namespaceoverview', index: 0}
-        ];
-    }
-    router.push({name: 'podoverview', params: {podname: data.name}, query: { action: 'edit' }}); // Or some other indicator. For now, just nav.
-}
-
-const handleDeletePod = (data: PodTableItem) => {
-    // For now, navigates to details view where delete options are.
-    // PodElement.vue already shows DeleteResource at the top.
-    if(globalStore.namespace === null){
-        globalStore.namespace = data.namespace;
-        globalStore.breadcrumbItems = [
-            {label: data.namespace, params:{namespace: data.namespace}
-                , navigateTo: 'namespaceoverview', index: 0}
-        ];
-    }
-    router.push({name: 'podoverview', params: {podname: data.name}, query: { action: 'delete' }}); // Or some other indicator.
-}
-
-const getPodActions = (podData: PodTableItem): MenuItem[] => {
-    return [
-        {
-            label: 'View Logs',
-            icon: 'pi pi-align-left',
-            command: () => gotoPodLogs(podData)
-        },
-        {
-            label: 'Exec into Pod',
-            icon: 'pi pi-terminal',
-            command: () => gotoPodExec(podData)
-        },
-        {
-            label: 'Edit YAML',
-            icon: 'pi pi-pencil',
-            command: () => gotoPodEdit(podData)
-        },
-        {
-            label: 'Delete',
-            icon: 'pi pi-trash',
-            command: () => handleDeletePod(podData)
-        }
-    ];
-}
-
 window.addEventListener('message', (event) => {
+    loading.value = false;
     if(event.data.type == "podList"){
-        loading.value = false;
-        errorMessage.value = null;
-        try {
-            const messageData = event.data.data;
-            if (messageData?.error) {
-                console.error("Error fetching pod list:", messageData.errormessage);
-                errorMessage.value = `Error fetching pod list: ${messageData.errormessage || 'Unknown error'}`;
-                podTableData.value = [];
-                podListData.value = null;
-                return;
-            }
+        // TODO: Handle error
+        const configDetails = JSON.parse(event.data.data) as PodListType;
 
-            const configDetails = JSON.parse(messageData.output || messageData) as PodListType; // messageData could be string or {output: string, error: boolean, ...}
-
-            if(configDetails?.items?.length > 0){
-                const timeAgo = new TimeAgo('en-US');
-                const tData = configDetails.items.map(item => {
-                    const timestamp = item.metadata?.creationTimestamp || (new Date()).toISOString();
+        if(configDetails?.items?.length > 0){
+            const timeAgo = new TimeAgo('en-US');
+            const tData = configDetails.items.map(item => {
+                const timestamp = item.metadata?.creationTimestamp || (new Date()).toISOString();
                 const age = timeAgo.format(new Date(timestamp));
                 
                 let readyInitContainers = 0;
@@ -290,20 +190,9 @@ window.addEventListener('message', (event) => {
                 }
             });
             
-                podTableData.value = [...tData];
-                podListData.value = configDetails;
-            }else{
-                // No items, but not necessarily an error from the command itself
-                podTableData.value = [];
-                podListData.value = null;
-                if (!configDetails || !configDetails.items) { // If parsing failed or items is not an array
-                     // This case might be redundant if error is caught by messageData.error or JSON.parse
-                    errorMessage.value = "Failed to parse pod list data or no items found.";
-                }
-            }
-        } catch (e: any) {
-            console.error("Error processing podList message:", e);
-            errorMessage.value = `Failed to process pod list data: ${e.message}`;
+            podTableData.value = [...tData];
+            podListData.value = configDetails;
+        }else{
             podTableData.value = [];
             podListData.value = null;
         }
@@ -311,7 +200,7 @@ window.addEventListener('message', (event) => {
 });
 
 onMounted(() => {
-    getPodList(); // This will also reset errorMessage.value
+    getPodList();
     if(globalStore.namespace !== null){
         isNamespace.value = true;
     }

@@ -62,10 +62,10 @@ export type SecretType = {
   
 
   export type SecretTableItem = {
-    uid: string; // Added for unique key
     age: string;
     timestamp: string;
     name: string;
+
     namespace: string;
     dataCount: number;
     type: string;

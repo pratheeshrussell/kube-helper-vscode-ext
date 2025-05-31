@@ -7,12 +7,13 @@ import ConfigMapList from "./components/clusterElements/elementList/ConfigMapLis
 import SecretList from "./components/clusterElements/elementList/SecretList.vue";
 import CustomResourceDefinitionList from "./components/clusterElements/elementList/CustomResourceDefinitionList.vue";
 import CustomResourceList from "./components/clusterElements/elementList/CustomResourceList.vue";
-import CustomResourceElement from "./components/clusterElements/CustomResourceElement.vue"; // Added
+import ResourceTreeView from "./components/TreeView/ResourceTreeView.vue"; // Added TreeView
 import PodElement from "./components/clusterElements/PodElement.vue";
 import ContainerElement from "./components/clusterElements/ContainerElement.vue";
 import ServiceElement from "./components/clusterElements/ServiceElement.vue";
 import ConfigMapElement from "./components/clusterElements/ConfigMapElement.vue";
 import SecretElement from "./components/clusterElements/SecretElement.vue";
+import CustomResourceElement from "./components/clusterElements/CustomResourceElement.vue"; // Added CR Element
 import IngressElement from "./components/clusterElements/IngressElement.vue";
 import ClusterRoleElement from "./components/clusterElements/ClusterRoleElement.vue";
 import ClusterRoleBindElement from "./components/clusterElements/ClusterRoleBindElement.vue";
@@ -30,20 +31,21 @@ const routes:Readonly<RouteRecordRaw[]> = [
             {path: 'secrets', name: 'secretlist', component: SecretList },
             {path: 'crds', name: 'crdlist', component: CustomResourceDefinitionList },
             {path: 'crds/:crdFullName/resources', name: 'crlist', component: CustomResourceList },
-            // Route for cluster-scoped CR details
-            {path: 'crds/:crdFullName/resources/:crName', name: 'crdetail', component: CustomResourceElement }, // Added
+            {path: 'crds/:crdFullName/resources/:crName', name: 'crdetail', component: CustomResourceElement },
+            {path: 'treeview', name: 'treeview', component: ResourceTreeView }, // Added TreeView route
+
             {path: 'ns/:namespace', name: 'namespaceoverview', component: NamespaceElements},
             {path: 'ns/:namespace/configmaps', name: 'configmaplistns', component: ConfigMapList },
             {path: 'ns/:namespace/secrets', name: 'secretlistns', component: SecretList },
-            // Route for namespaced CR details
-            {path: 'ns/:namespace/crds/:crdFullName/resources/:crName', name: 'crdetailns', component: CustomResourceElement }, // Added
+            {path: 'ns/:namespace/crds/:crdFullName/resources/:crName', name: 'crdetailns', component: CustomResourceElement },
+
             {path: 'pod/:podname', name: 'podoverview', component: PodElement},
             {path: 'pod/:podname/c/:container', name: 'containeroverview', component: ContainerElement},
 
             {path: 'svc/:svcname', name: 'svcoverview', component: ServiceElement},
 
             {path: 'ns/:namespace/configmap/:cmname', name: 'configmapoverview', component: ConfigMapElement},
-            {path: 'ns/:namespace/secret/:secretname', name: 'secretoverview', component: SecretElement}, // Updated
+            {path: 'ns/:namespace/secret/:secretname', name: 'secretoverview', component: SecretElement},
             {path: 'ingress/:ingressname', name: 'ingressoverview', component: IngressElement},
 
             {path: 'clusterrole/:crname', name: 'clusterRoleoverview', component: ClusterRoleElement},
