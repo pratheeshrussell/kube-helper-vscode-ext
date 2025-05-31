@@ -92,13 +92,13 @@ window.addEventListener('message', (event) => {
     if(event.data.type == "configmapList"){
         // TODO: Handle error
         const configDetails = JSON.parse(event.data.data) as ConfigMapListType;
-        
+
         if(configDetails?.items && configDetails?.items?.length > 0){
             const timeAgo = new TimeAgo('en-US');
             const tData = configDetails.items.map((item:ConfigMapType) => {
                 const timeStamp = item?.metadata?.creationTimestamp || (new Date()).toISOString();
                 const age = timeAgo.format(new Date(timeStamp));
-                
+
                 return {
                     age: age,
                     timestamp: timeStamp,

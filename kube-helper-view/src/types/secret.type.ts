@@ -65,7 +65,7 @@ export type SecretType = {
     age: string;
     timestamp: string;
     name: string;
-    
+
     namespace: string;
     dataCount: number;
     type: string;

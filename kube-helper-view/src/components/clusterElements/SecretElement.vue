@@ -21,10 +21,10 @@ const secretEditCommand = ref('');
 onMounted(() => {
     const secretname = route.params.secretname;
 
-    if((secretname !== null ) && 
+    if((secretname !== null ) &&
     (typeof secretname === 'string')){
         secretName.value = secretname;
-        
+
         isSecretName.value = true;
 
         secretDescribeCommand.value = kubeCmds.describeNamespacedResource
@@ -33,12 +33,12 @@ onMounted(() => {
 
         secretEditCommand.value = kubeCmds.editNamespacedResource.replace("{{resType}}", 'secret')
         .replace("{{resName}}", secretname);
-        
+
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,
             {
-                label: secretname, 
-                navigateTo: 'secretoverview', 
+                label: secretname,
+                navigateTo: 'secretoverview',
                 params:{secretname: secretname},
                 index: globalStore.breadcrumbItems.length
             }
@@ -60,7 +60,7 @@ onMounted(() => {
             <TabList>
                 <Tab value="0">Data</Tab>
                 <Tab value="1">Describe</Tab>
-                
+
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -69,7 +69,7 @@ onMounted(() => {
                 <TabPanel value="1">
                     <DescribeViewer :describeCommand="secretDescribeCommand" />
                 </TabPanel>
-                
+
             </TabPanels>
         </Tabs>
     </div>

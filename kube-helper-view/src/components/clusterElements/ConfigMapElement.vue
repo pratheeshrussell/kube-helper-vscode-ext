@@ -20,7 +20,7 @@ const cmEditCommand = ref('');
 onMounted(() => {
     const cmname = route.params.cmname;
 
-    if((cmname !== null ) && 
+    if((cmname !== null ) &&
     (typeof cmname === 'string')){
         cmName.value = cmname;
         
@@ -35,8 +35,8 @@ onMounted(() => {
         globalStore.breadcrumbItems = [
             ...globalStore.breadcrumbItems,
             {
-                label: cmname, 
-                navigateTo: 'configmapoverview', 
+                label: cmname,
+                navigateTo: 'configmapoverview',
                 params:{cmname: cmname},
                 index: globalStore.breadcrumbItems.length
             }
@@ -66,7 +66,7 @@ onMounted(() => {
                 <TabPanel value="1">
                     <DescribeViewer :describeCommand="cmDescribeCommand" />
                 </TabPanel>
-                
+
             </TabPanels>
         </Tabs>
     </div>

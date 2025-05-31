@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { MessageTypes } from "../../common/messageTypes";
 import { Utils } from "../support/utils";
 import { runCommand } from "../support/commandHandler";
+import { handleGetResourceGraph } from "../support/resourceGraphHelper"; // Added
 import CreateClusterDetailsPanelUI from "./clusterDetailsPanel";
 
 
@@ -23,25 +24,36 @@ export class SidebarUIProvider implements vscode.WebviewViewProvider {
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
         
         // Listen for messages from the Sidebar component and execute action
-        webviewView.webview.onDidReceiveMessage(async (data) => {
-            switch (data.type) {
+        webviewView.webview.onDidReceiveMessage(async (message) => { // Renamed data to message for clarity
+            switch (message.type) {
                 case MessageTypes.VIEW_READY: {
                     vscode.window.showInformationMessage('Sidebar active');  
                     break;
                 }  
                 case MessageTypes.RUN_CMD_RESULT: {
-                    runCommand(data.command).then((result) => {
+                    runCommand(message.command).then((result) => {
                         webviewView.webview.postMessage({
-                            type: data.subType,
+                            type: message.subType,
                             data: result
                         });
                     });
                     
                     break;
-                }  
+                }
+                case MessageTypes.GET_RESOURCE_GRAPH: {
+                    if (message.subType === 'namespaceGraph' && message.data?.namespace && webviewView) {
+                        // Assuming context is globally managed or needs to be retrieved here
+                        // For now, let's try to get it from a known global place or pass undefined
+                        // const currentContext = vscode.workspace.getConfiguration('kube-helper').get('current-context'); // Example
+                        const currentContext = Utils.getCurrentKubeContext(); // Assuming Utils has a method for this
+
+                        handleGetResourceGraph(webviewView, message.data.namespace, currentContext);
+                    }
+                    break;
+                }
                 case MessageTypes.SHOW_DETAILS: {
-                    const clusterName = data.clusterName;
-                    const contextName = data.contextName;
+                    const clusterName = message.clusterName;
+                    const contextName = message.contextName;
                     if(clusterName){
                         const clusterParams = {
                             clusterName: clusterName,

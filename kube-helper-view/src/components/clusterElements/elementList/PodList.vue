@@ -111,7 +111,7 @@ window.addEventListener('message', (event) => {
     if(event.data.type == "podList"){
         // TODO: Handle error
         const configDetails = JSON.parse(event.data.data) as PodListType;
-        
+
         if(configDetails?.items?.length > 0){
             const timeAgo = new TimeAgo('en-US');
             const tData = configDetails.items.map(item => {
