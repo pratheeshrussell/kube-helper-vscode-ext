@@ -11,10 +11,12 @@ export type BreadCrumbItem = {
 export type Tstore = {
     context: string | null,
     namespace: string | null,
-    breadcrumbItems: BreadCrumbItem[]
+    breadcrumbItems: BreadCrumbItem[],
+    theme: string | null, // Added theme property
 }
 export const globalStore = reactive<Tstore>({
     context: null,
     namespace: null,
-    breadcrumbItems:[]
+    breadcrumbItems:[],
+    theme: '1', // Initialize with a default theme value (e.g., '1' for light, or based on VSCode default)
 });
