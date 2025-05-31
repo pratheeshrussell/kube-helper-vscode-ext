@@ -4,6 +4,9 @@ import Namespaces from './elementList/Namespaces.vue';
 import ClusterNodes from './elementList/ClusterNodes.vue';
 import { globalStore } from '../../store/store';
 import PodList from './elementList/PodList.vue';
+import ConfigMapList from './elementList/ConfigMapList.vue';
+import SecretList from './elementList/SecretList.vue';
+import CustomResourceDefinitionList from './elementList/CustomResourceDefinitionList.vue'; // Added
 import PVList from './elementList/PVList.vue';
 import EventList from '../common/EventList.vue';
 import StorageClassList from './elementList/StorageClassList.vue';
@@ -42,6 +45,9 @@ onMounted(() => {
                 <Tab value="ns">Namespaces</Tab>
                 <Tab value="nodes">Nodes</Tab>
                 <Tab value="pods">Pods</Tab>
+                <Tab value="cm">ConfigMaps</Tab>
+                <Tab value="secrets">Secrets</Tab>
+                <Tab value="crds">CRDs</Tab> <!-- Added -->
                 <Tab value="pv">Persistent Vol</Tab>
                 <Tab value="event">Events</Tab>
                 <Tab value="cr">Cluster Roles</Tab>
@@ -58,6 +64,15 @@ onMounted(() => {
                 </TabPanel>
                 <TabPanel value="pods">
                     <PodList />
+                </TabPanel>
+                <TabPanel value="cm">
+                    <ConfigMapList />
+                </TabPanel>
+                <TabPanel value="secrets">
+                    <SecretList />
+                </TabPanel>
+                <TabPanel value="crds"> <!-- Added -->
+                    <CustomResourceDefinitionList />
                 </TabPanel>
                 <TabPanel value="pv">
                     <PVList />

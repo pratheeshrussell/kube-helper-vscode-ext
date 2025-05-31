@@ -5,6 +5,7 @@ export const kubeCmds = {
     // namespaced Resources
     getNamespacedResourceByType: "kubectl get {{resType}} {{namespace}} {{context}} -o json",
     getNamespacedResourceByName: "kubectl get {{resType}} {{resName}} {{namespace}} {{context}} -o json",
+    getNamespacedResourceByNameOutput: "kubectl get {{resType}} {{resName}} {{namespace}} {{context}} -o yaml", // Added
     getEventsPerResource: "kubectl get events --field-selector involvedObject.kind={{resType}},involvedObject.name={{resName}} {{namespace}} {{context}} -o json",
     //
     getNamespacedResourceLogs: "kubectl logs {{resType}}/{{resName}} {{namespace}} {{context}}",

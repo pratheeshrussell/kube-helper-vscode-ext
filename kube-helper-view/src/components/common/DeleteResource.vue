@@ -8,7 +8,9 @@
 <script setup lang="ts">
 import { MessageTypes } from '@common/messageTypes';
 import { HelperUtils } from '@src/utils/helpers';
+import { useToast } from 'primevue/usetoast';
 
+const toast = useToast();
 
 const inputprops = defineProps({
     deleteCommand: {
@@ -31,9 +33,14 @@ const sendRemoveCommand = () => {
 };
 
 window.addEventListener('message', (event) => {
-    if (event.data.type == "rundelete") {
-        if (event.data.data) {
+    if (event.data.type === "rundelete" && event.data.command === HelperUtils.prepareCommand(inputprops.deleteCommand)) {
+        const messageData = event.data.data;
+        if (messageData && !messageData.error) {
+            toast.add({ severity: 'success', summary: 'Success', detail: messageData.output || 'Resource deleted successfully.', life: 3000 });
             emit('deleted');
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: `Failed to delete resource: ${messageData?.errormessage || messageData?.output || 'Unknown error'}`, life: 5000 });
+            // Optionally emit a 'delete-failed' event if parent components need to react
         }
     }
 });
