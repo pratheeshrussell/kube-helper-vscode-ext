@@ -36,7 +36,7 @@
 import { ref, computed, watch } from 'vue'; // Removed onMounted
 import { globalStore } from '../../store/store';
 import { useRoute, useRouter } from 'vue-router';
-import { kubeCmds } from '@src/constants/commands';
+// import { kubeCmds } from '@src/constants/commands'; // Removed
 import { HelperUtils } from '@src/utils/helpers';
 
 import Tabs from 'primevue/tabs';

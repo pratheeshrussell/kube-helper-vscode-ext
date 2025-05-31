@@ -34,9 +34,10 @@ import dagre from 'dagre';
 // Import Vue Flow styles
 import '@vue-flow/core/dist/style.css';
 import '@vue-flow/core/dist/theme-default.css';
-import '@vue-flow/controls/dist/style.css';
-import '@vue-flow/minimap/dist/style.css';
-import '@vue-flow/background/dist/style.css';
+// Controls, MiniMap, and Background styles are usually included by the core style and theme
+// import '@vue-flow/controls/dist/style.css';
+// import '@vue-flow/minimap/dist/style.css';
+// import '@vue-flow/background/dist/style.css'; // This was causing the error
 
 import type { K8sVueFlowNode, K8sVueFlowEdge } from '@src/types/treeView.type';
 import { globalStore } from '@src/store/store';
