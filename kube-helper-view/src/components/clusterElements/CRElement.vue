@@ -4,7 +4,8 @@ import { useRoute } from 'vue-router';
 import { MessageTypes } from '@common/messageTypes';
 import { kubeCmds } from '../../constants/commands';
 import type { KubeCustomResource } from '@apptypes/cr.type';
-import type { KubeCustomResourceDefinition } from '@apptypes/crd.type'; // To get Kind
+// KubeCustomResourceDefinitionVersion removed as it might be causing TS6196 if only used in .find() type hint
+import type { KubeCustomResourceDefinition } from '@apptypes/crd.type';
 import { globalStore } from '../../store/store';
 import DescribeViewer from '../common/DescribeViewer.vue';
 import EditResource from '../common/EditResource.vue';
@@ -12,11 +13,12 @@ import VueJsonPretty from 'vue-json-pretty'; // For displaying spec/status
 import 'vue-json-pretty/lib/styles.css';
 
 const cr = ref<KubeCustomResource | null>(null);
+const crd = ref<KubeCustomResourceDefinition | null>(null); // This is to store the definition of the CRD itself
 const crdKind = ref<string>(''); // To store the Kind from CRD
-const crDescription = ref('');
+// const crDescription = ref(''); // Removed
 const loading = ref(false);
-const loadingDescription = ref(false);
-const showEditModal = ref(false);
+// const loadingDescription = ref(false); // Removed
+// const showEditModal = ref(false); // Removed
 const route = useRoute();
 
 const crdName = computed(() => route.params.crdName as string); // Plural name of CRD
@@ -28,7 +30,7 @@ const fetchCRDDetailsForKind = () => {
     tsvscode.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'getSingleCRDForCRElement',
-        command: `${kubeCmds.getResource('crd', crdName.value)} -o json`,
+        command: kubeCmds.getCRDByName.replace('{{crdName}}', crdName.value),
         data: { resourceName: crdName.value } // Pass crdName to identify response
     });
 };
@@ -55,26 +57,37 @@ const fetchCRDetails = () => {
     });
 };
 
-const fetchCRDescription = () => {
-    if (!crd.value && !crdKind.value) { // Check if kind or full CRD object is available
-        console.warn("CRD Kind/Definition not yet fetched, deferring CR description fetch.");
-        return;
-    }
-    loadingDescription.value = true;
-    // Use the actual kind from CRD for describe command
-    let kindToDescribe = crdKind.value || crd.value!.spec.names.kind; // Added non-null assertion for crd.value as one of them must be true
-    let command = `kubectl describe ${kindToDescribe} ${crName.value}`;
-    if (crNamespace.value) {
-        command += ` -n ${crNamespace.value}`;
-    }
-    tsvscode.postMessage({
-        type: MessageTypes.RUN_CMD_RESULT,
-        subType: 'describeCRElement',
-        command: command,
-        data: { resourceName: crName.value, namespace: crNamespace.value }
-    });
-};
+// fetchCRDescription removed
+// const fetchCRDescription = () => {
+//     if (!crd.value && !crdKind.value) { // Check if kind or full CRD object is available
+//         console.warn("CRD Kind/Definition not yet fetched, deferring CR description fetch.");
+//         return;
+//     }
+//     loadingDescription.value = true; // TS2304 loadingDescription not found
+//     // Use the actual kind from CRD for describe command
+//     let kindToDescribe = crdKind.value || crd.value!.spec.names.kind;
+//     let command = `kubectl describe ${kindToDescribe} ${crName.value}`;
+//     if (crNamespace.value) {
+//         command += ` -n ${crNamespace.value}`;
+//     }
+//     tsvscode.postMessage({
+//         type: MessageTypes.RUN_CMD_RESULT,
+//         subType: 'describeCRElement',
+//         command: command,
+//         data: { resourceName: crName.value, namespace: crNamespace.value }
+//     });
+// };
 
+const describeCrCommand = computed(() => {
+    if (crdKind.value && crName.value) {
+        let cmd = `kubectl describe ${crdKind.value} ${crName.value}`;
+        if (crNamespace.value) {
+            cmd += ` -n ${crNamespace.value}`;
+        }
+        return cmd;
+    }
+    return ''; // Return empty or a placeholder if not ready
+});
 
 window.addEventListener('message', (event) => {
     const { subType, data, commandData } = event.data; // data is the new response object
@@ -90,7 +103,7 @@ window.addEventListener('message', (event) => {
                 crd.value = crdDef; // Store the fetched CRD definition
                 crdKind.value = crdDef.spec.names.kind;
                 fetchCRDetails();
-                fetchCRDescription();
+                // fetchCRDescription(); // Removed
                 updateBreadcrumb();
             } catch (e) {
                 console.error('Error parsing CRD for Kind:', e, response.stdout);
@@ -143,30 +156,32 @@ window.addEventListener('message', (event) => {
             tsvscode.postMessage({ type: MessageTypes.SHOW_ERROR, payload: `Error fetching CR details: ${errorMessage} ${errorDetails}`.trim() });
             cr.value = null;
         }
-    } else if (subType === 'describeCRElement') {
-        loadingDescription.value = false;
-        if (response && response.success) {
-            if (response.stderr) {
-                console.warn(`Stderr content for describeCRElement: ${response.stderr}`);
-            }
-            crDescription.value = response.stdout;
-        } else {
-            const errorMessage = response?.error || `Unknown error for describeCRElement.`;
-            const errorDetails = response?.stderr || (response.success === false ? response.stdout : '');
-            console.error(`Error for describeCRElement:`, errorMessage, errorDetails);
-            tsvscode.postMessage({ type: MessageTypes.SHOW_ERROR, payload: `Error fetching CR description: ${errorMessage} ${errorDetails}`.trim() });
-            crDescription.value = errorDetails || errorMessage;
-        }
     }
+    // Removed describeCRElement handler
+    // else if (subType === 'describeCRElement') {
+    //     loadingDescription.value = false;
+    //     if (response && response.success) {
+    //         if (response.stderr) {
+    //             console.warn(`Stderr content for describeCRElement: ${response.stderr}`);
+    //         }
+    //         crDescription.value = response.stdout;
+    //     } else {
+    //         const errorMessage = response?.error || `Unknown error for describeCRElement.`;
+    //         const errorDetails = response?.stderr || (response.success === false ? response.stdout : '');
+    //         console.error(`Error for describeCRElement:`, errorMessage, errorDetails);
+    //         tsvscode.postMessage({ type: MessageTypes.SHOW_ERROR, payload: `Error fetching CR description: ${errorMessage} ${errorDetails}`.trim() });
+    //         crDescription.value = errorDetails || errorMessage;
+    //     }
+    // }
 });
 
-const openEditModal = () => {
-    showEditModal.value = true;
-};
+// const openEditModal = () => { // Removed
+//     showEditModal.value = true;
+// };
 
 const handleEditSuccess = () => {
     fetchCRDetails();
-    fetchCRDescription();
+    // fetchCRDescription(); // Removed
 };
 
 const updateBreadcrumb = () => {
@@ -192,24 +207,33 @@ const updateBreadcrumb = () => {
         } else {
             baseBreadcrumb = globalStore.breadcrumbItems.slice(0, crListEntryIndex + 1);
         }
-
-        globalStore.setBreadcrumb([
+        globalStore.breadcrumbItems = [
             ...baseBreadcrumb,
-            { label: cr.value.metadata.name, navigateTo: 'crdetail', params: { crdName: crdName.value, crName: cr.value.metadata.name, crNamespace: cr.value.metadata.namespace }, index: baseBreadcrumb.length }
-        ]);
+            {
+                label: cr.value.metadata.name,
+                navigateTo: 'crdetail',
+                params: {
+                    crdName: crdName.value,
+                    crName: cr.value.metadata.name,
+                    ...(cr.value.metadata.namespace && { crNamespace: cr.value.metadata.namespace })
+                },
+                index: baseBreadcrumb.length
+            }
+        ];
     }
 };
 
 onMounted(() => {
     fetchCRDDetailsForKind(); // Start by fetching CRD to get Kind
-    // fetchCRDetails and fetchCRDescription will be called after CRD details are back
+    // fetchCRDetails will be called after CRD details are back
+    // fetchCRDescription(); // Removed
 });
 
 watch(() => [route.params.crdName, route.params.crName, route.params.crNamespace], (newVal, oldVal) => {
     if (newVal.join(',') !== oldVal.join(',')) {
         cr.value = null;
         crdKind.value = '';
-        crDescription.value = '';
+        // crDescription.value = ''; // Removed
         fetchCRDDetailsForKind();
     }
 });
@@ -229,13 +253,13 @@ const crActualKind = computed(() => cr.value?.kind || crdKind.value);
             <div class="flex justify-content-between align-items-center mb-3">
                 <h2 class="m-0">{{ crActualKind }}: {{ cr.metadata.name }}</h2>
                 <div>
-                    <Button icon="pi pi-pencil" label="Edit" @click="openEditModal" class="p-button-info mr-2" />
-                    <Button icon="pi pi-refresh" @click="() => { fetchCRDetails(); fetchCRDescription(); }" :loading="loading || loadingDescription" v-tooltip.left="'Refresh'" />
+                    <EditResource v-if="crApiVersion && crActualKind" :editCommand="`kubectl edit ${crActualKind} ${crName}${crNamespace ? ' -n ' + crNamespace : ''}`" @command-run="handleEditSuccess" :buttonText="`Edit ${crActualKind}`" class="mr-2"/>
+                    <Button icon="pi pi-refresh" @click="fetchCRDetails" :loading="loading" v-tooltip.left="'Refresh'" />
                 </div>
             </div>
 
             <TabView>
-                <TabPanel header="Details">
+                <TabPanel header="Details" value="details">
                     <Panel header="Metadata" class="mb-3">
                         <div class="grid">
                             <div class="col-12 md:col-6"><strong>Name:</strong> {{ cr.metadata.name }}</div>
@@ -269,12 +293,12 @@ const crActualKind = computed(() => cr.value?.kind || crdKind.value);
                         <vue-json-pretty :data="cr.status" :deep="3" showLength />
                     </Panel>
                 </TabPanel>
-                <TabPanel header="Describe">
-                    <DescribeViewer :description="crDescription" :loading="loadingDescription" />
+                <TabPanel header="Describe" value="describe">
+                    <DescribeViewer v-if="describeCrCommand" :describeCommand="describeCrCommand" />
+                    <p v-else>Determining describe command...</p>
                 </TabPanel>
-                 <TabPanel header="YAML">
-                     <!-- Display read-only YAML if not editing -->
-                    <pre v-if="cr && !showEditModal" class="yaml-view">{{ JSON.stringify(cr, null, 2) }}</pre>
+                 <TabPanel header="YAML" value="yaml">
+                    <pre v-if="cr" class="yaml-view">{{ JSON.stringify(cr, null, 2) }}</pre>
                 </TabPanel>
             </TabView>
         </div>
@@ -284,20 +308,7 @@ const crActualKind = computed(() => cr.value?.kind || crdKind.value);
         <div v-else-if="!loading">
             <Message severity="error">Could not load details for {{ crdName }} {{ crName }}.</Message>
         </div>
-
-        <Dialog v-model:visible="showEditModal" modal :header="`Edit ${crActualKind}: ${crName}`" :style="{ width: '75vw' }">
-            <EditResource
-                v-if="cr"
-                :isModal="false"
-                :resourceType="crdName"
-                :resourceName="crName"
-                :namespace="crNamespace"
-                :kind="crActualKind"
-                :resourceApiVersion="crApiVersion"
-                @close="showEditModal = false"
-                @success="handleEditSuccess"
-            />
-        </Dialog>
+        <!-- Dialog and internal EditResource removed -->
     </div>
 </template>
 

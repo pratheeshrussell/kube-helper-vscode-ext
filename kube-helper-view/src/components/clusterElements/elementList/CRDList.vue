@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { MessageTypes } from '@common/messageTypes';
 import { kubeCmds } from '../../../constants/commands';
-import type { KubeCustomResourceDefinition, KubeCRDList } from '@apptypes/crd.type';
+import type { KubeCustomResourceDefinition, KubeCustomResourceDefinitionVersion, KubeCRDList } from '@apptypes/crd.type';
 import { globalStore } from '../../../store/store';
 import { useRouter } from 'vue-router';
 
@@ -68,22 +68,22 @@ const filteredCRDs = computed(() => {
 const viewCRs = (crd: KubeCustomResourceDefinition) => {
     // Navigate to a route that will display CRs for this CRD
     // This route will be defined later in Router.ts
-    globalStore.setBreadcrumb([
+    globalStore.breadcrumbItems = [
         { label: 'Cluster Overview', navigateTo: 'clusteroverview', params: null, index: 0 },
         { label: 'CRDs', navigateTo: 'crdlist', params: null, index: 1 }, // Assuming 'crdlist' is the route for this component
         { label: crd.spec.names.kind, navigateTo: 'crlist', params: { crdName: crd.metadata.name }, index: 2 }
-    ]);
+    ];
     router.push({ name: 'crlist', params: { crdName: crd.metadata.name } });
 };
 
 const viewCRDDetails = (crd: KubeCustomResourceDefinition) => {
     // Navigate to a route that will display CRD details
     // This route will be defined later in Router.ts
-    globalStore.setBreadcrumb([
+    globalStore.breadcrumbItems = [
         { label: 'Cluster Overview', navigateTo: 'clusteroverview', params: null, index: 0 },
         { label: 'CRDs', navigateTo: 'crdlist', params: null, index: 1 },
         { label: crd.metadata.name, navigateTo: 'crddetail', params: { crdName: crd.metadata.name }, index: 2 }
-    ]);
+    ];
     router.push({ name: 'crddetail', params: { crdName: crd.metadata.name } });
 }
 
@@ -118,7 +118,7 @@ onMounted(() => {
                 <Column field="spec.scope" header="Scope" sortable />
                 <Column field="spec.versions[0].name" header="Default Version" sortable>
                      <template #body="slotProps">
-                        {{ slotProps.data.spec.versions.find(v => v.storage)?.name || slotProps.data.spec.versions[0]?.name }}
+                        {{ slotProps.data.spec.versions.find((v: KubeCustomResourceDefinitionVersion) => v.storage)?.name || slotProps.data.spec.versions[0]?.name }}
                     </template>
                 </Column>
                  <Column header="Actions">

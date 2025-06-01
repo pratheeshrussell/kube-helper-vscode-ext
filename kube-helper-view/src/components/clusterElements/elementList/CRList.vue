@@ -6,7 +6,7 @@ import { kubeCmds } from '../../../constants/commands';
 import type { KubeCustomResource, KubeCRList } from '@apptypes/cr.type';
 import type { KubeCustomResourceDefinition } from '@apptypes/crd.type';
 import { globalStore } from '../../../store/store';
-import type { KubeNamespace } from '@apptypes/namespace.type'; // Assuming you have a namespace type
+import type { Item as KubeNamespace } from '@apptypes/namespace.type';
 
 const crs = ref<KubeCustomResource[]>([]);
 const crd = ref<KubeCustomResourceDefinition | null>(null);
@@ -14,7 +14,7 @@ const loading = ref(false);
 const filterText = ref('');
 const route = useRoute();
 const router = useRouter();
-const selectedNamespace = ref<string | null>(globalStore.selectedNamespace || 'all'); // Default to 'all' or current
+const selectedNamespace = ref<string | null>(globalStore.namespace || 'all');
 const namespaces = ref<KubeNamespace[]>([]); // To store list of namespaces for dropdown
 
 const crdName = computed(() => route.params.crdName as string);
@@ -24,7 +24,7 @@ const fetchCRDDetails = () => {
     tsvscode.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'getSingleCRD',
-        command: `${kubeCmds.getResource('crd', crdName.value)} -o json`,
+        command: kubeCmds.getCRDByName.replace('{{crdName}}', crdName.value),
     });
 };
 
@@ -32,7 +32,7 @@ const fetchNamespaces = () => {
     tsvscode.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'getNamespacesForCRList',
-        command: `${kubeCmds.getNamespaces} -o json`
+        command: kubeCmds.getNamespaces // No -o json needed if getNamespaces already includes it
     });
 };
 
@@ -58,8 +58,8 @@ const fetchCRs = () => {
 };
 
 window.addEventListener('message', (event) => {
-    const { subType, data, command } = event.data; // data is the new response object
-    const response = data; // Rename for clarity within this block
+    const { subType, data } = event.data; // Removed commandData from destructuring as event.data.commandData is used directly
+    const response = data; // data is the new response object
 
     if (subType === 'getSingleCRD') {
         if (response && response.success) {
@@ -140,17 +140,42 @@ const filteredCRs = computed(() => {
 
 const viewCRDetails = (cr: KubeCustomResource) => {
     if (!crd.value) return;
-    const crKind = crd.value.spec.names.kind;
-    globalStore.setBreadcrumb([
-        ...globalStore.breadcrumbItems.slice(0, globalStore.breadcrumbItems.findIndex(item => item.navigateTo === 'crlist') + 1),
-        { label: cr.metadata.name, navigateTo: 'crdetail', params: { crdName: crdName.value, crName: cr.metadata.name, crNamespace: cr.metadata.namespace }, index: globalStore.breadcrumbItems.length }
-    ]);
-    router.push({
-        name: 'crdetail',
+    // const crKind = crd.value.spec.names.kind; // Removed unused variable
+    // New logic: find the index of 'crlist' and build new array from there
+    const crListEntryIndex = globalStore.breadcrumbItems.findIndex(item => item.navigateTo === 'crlist' && item.params?.crdName === crdName.value);
+    let newBreadcrumbs = [];
+    if (crListEntryIndex !== -1) {
+        newBreadcrumbs = globalStore.breadcrumbItems.slice(0, crListEntryIndex + 1);
+    } else { // Fallback if 'crlist' isn't found (e.g. direct navigation)
+         const crdsEntryIndex = globalStore.breadcrumbItems.findIndex(item => item.label === 'CRDs' && item.navigateTo === 'crdlist');
+         if (crdsEntryIndex !== -1) {
+            newBreadcrumbs = globalStore.breadcrumbItems.slice(0, crdsEntryIndex + 1);
+         } else {
+            newBreadcrumbs.push({ label: 'Cluster Overview', navigateTo: 'clusteroverview', params: null, index: 0 });
+            newBreadcrumbs.push({ label: 'CRDs', navigateTo: 'crdlist', params: null, index: 1 });
+         }
+         // Add the current CRD kind if CRList entry wasn't found
+         if (crd.value) {
+            newBreadcrumbs.push({ label: crd.value.spec.names.kind, navigateTo: 'crlist', params: { crdName: crdName.value }, index: newBreadcrumbs.length });
+         }
+    }
+    newBreadcrumbs.push({
+        label: cr.metadata.name,
+        navigateTo: 'crdetail',
         params: {
             crdName: crdName.value,
             crName: cr.metadata.name,
-            crNamespace: cr.metadata.namespace || undefined // Pass namespace if it exists
+            ...(cr.metadata.namespace && { crNamespace: cr.metadata.namespace })
+        },
+        index: newBreadcrumbs.length
+    });
+    globalStore.breadcrumbItems = newBreadcrumbs;
+    router.push({
+        name: 'crdetail',
+        params: { // For router, undefined is fine for optional params
+            crdName: crdName.value,
+            crName: cr.metadata.name,
+            crNamespace: cr.metadata.namespace // Let vue-router handle undefined if cr.metadata.namespace is undefined
         }
     });
 };
@@ -173,19 +198,18 @@ const updateBreadcrumb = () => {
         const crdsEntryIndex = globalStore.breadcrumbItems.findIndex(item => item.label === 'CRDs' && item.navigateTo === 'crdlist');
 
         let baseBreadcrumb = [];
-        if (crdsEntryIndex === -1) { // If 'CRDs' is not there, build from 'Cluster Overview'
+        if (crdsEntryIndex === -1) {
             baseBreadcrumb = [
                 { label: 'Cluster Overview', navigateTo: 'clusteroverview', params: null, index: 0 },
                 { label: 'CRDs', navigateTo: 'crdlist', params: null, index: 1 }
             ];
-        } else { // If 'CRDs' is present, take breadcrumb up to that point
+        } else {
             baseBreadcrumb = globalStore.breadcrumbItems.slice(0, crdsEntryIndex + 1);
         }
-
-        globalStore.setBreadcrumb([
+        globalStore.breadcrumbItems = [
             ...baseBreadcrumb,
             { label: crd.value.spec.names.kind, navigateTo: 'crlist', params: { crdName: crdName.value }, index: baseBreadcrumb.length }
-        ]);
+        ];
     }
 };
 

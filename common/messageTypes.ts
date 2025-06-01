@@ -2,5 +2,7 @@ export const MessageTypes = {
     VIEW_READY: 'VIEW_READY',
     RUN_CMD_TERMINAL: 'RUN_CMD_TERMINAL',
     RUN_CMD_RESULT: 'RUN_CMD_RESULT',
-    SHOW_DETAILS: 'OPEN_DETAILS'
+    SHOW_DETAILS: 'OPEN_DETAILS',
+    SHOW_ERROR: 'SHOW_ERROR', // Added
+    SHOW_WARNING: 'SHOW_WARNING' // Added
 } as const;

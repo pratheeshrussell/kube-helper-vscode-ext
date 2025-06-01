@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router'; // Removed useRouter
 import { MessageTypes } from '@common/messageTypes';
 import { kubeCmds } from '../../constants/commands';
 import type { KubeCustomResourceDefinition } from '@apptypes/crd.type';
@@ -9,12 +9,12 @@ import DescribeViewer from '../common/DescribeViewer.vue';
 import EditResource from '../common/EditResource.vue'; // Assuming EditResource can handle generic resources
 
 const crd = ref<KubeCustomResourceDefinition | null>(null);
-const crdDescription = ref('');
+// const crdDescription = ref(''); // Removed
 const loading = ref(false);
-const loadingDescription = ref(false);
-const showEditModal = ref(false);
+// const loadingDescription = ref(false); // Removed
+// const showEditModal = ref(false); // Removed
 const route = useRoute();
-const router = useRouter();
+// const router = useRouter(); // Removed
 
 const crdName = computed(() => route.params.crdName as string);
 
@@ -23,20 +23,20 @@ const fetchCRDDetails = () => {
     tsvscode.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'getSingleCRDElement', // Unique subType for this component
-        command: `${kubeCmds.getResource('crd', crdName.value)} -o json`,
+        command: kubeCmds.getCRDByName.replace('{{crdName}}', crdName.value),
         data: { resourceName: crdName.value }
     });
 };
 
-const fetchCRDDescription = () => {
-    loadingDescription.value = true;
-    tsvscode.postMessage({
-        type: MessageTypes.RUN_CMD_RESULT,
-        subType: 'describeCRDElement', // Unique subType
-        command: `kubectl describe crd ${crdName.value}`,
-        data: { resourceName: crdName.value }
-    });
-};
+// const fetchCRDDescription = () => { // Removed
+//     loadingDescription.value = true;
+//     tsvscode.postMessage({
+//         type: MessageTypes.RUN_CMD_RESULT,
+//         subType: 'describeCRDElement', // Unique subType
+//         command: kubeCmds.describeCRDByName.replace('{{crdName}}', crdName.value),
+//         data: { resourceName: crdName.value }
+//     });
+// };
 
 window.addEventListener('message', (event) => {
     // Assuming commandData was used in postMessage to pass resourceName
@@ -68,22 +68,23 @@ window.addEventListener('message', (event) => {
             tsvscode.postMessage({ type: MessageTypes.SHOW_ERROR, payload: `Error fetching CRD details: ${errorMessage} ${errorDetails}`.trim() });
             crd.value = null;
         }
-    } else if (subType === 'describeCRDElement') {
-        loadingDescription.value = false;
-        if (response && response.success) {
-            if (response.stderr) {
-                console.warn(`Stderr content for describeCRDElement: ${response.stderr}`);
-                 // Potentially show stderr as a warning or append to description if it's relevant for 'describe'
-            }
-            crdDescription.value = response.stdout; // describe output is plain text
-        } else {
-            const errorMessage = response?.error || `Unknown error for describeCRDElement.`;
-            const errorDetails = response?.stderr || (response.success === false ? response.stdout : ''); // Sometimes describe errors are in stdout
-            console.error(`Error for describeCRDElement:`, errorMessage, errorDetails);
-            tsvscode.postMessage({ type: MessageTypes.SHOW_ERROR, payload: `Error fetching CRD description: ${errorMessage} ${errorDetails}`.trim() });
-            crdDescription.value = errorDetails || errorMessage; // Show error in description area
-        }
     }
+    // Removed describeCRDElement handler, logic now in DescribeViewer.vue
+    // else if (subType === 'describeCRDElement') {
+    //     loadingDescription.value = false;
+    //     if (response && response.success) {
+    //         if (response.stderr) {
+    //             console.warn(`Stderr content for describeCRDElement: ${response.stderr}`);
+    //         }
+    //         crdDescription.value = response.stdout;
+    //     } else {
+    //         const errorMessage = response?.error || `Unknown error for describeCRDElement.`;
+    //         const errorDetails = response?.stderr || (response.success === false ? response.stdout : '');
+    //         console.error(`Error for describeCRDElement:`, errorMessage, errorDetails);
+    //         tsvscode.postMessage({ type: MessageTypes.SHOW_ERROR, payload: `Error fetching CRD description: ${errorMessage} ${errorDetails}`.trim() });
+    //         crdDescription.value = errorDetails || errorMessage;
+    //     }
+    // }
 });
 
 const storedVersions = computed(() => {
@@ -107,13 +108,13 @@ const versions = computed(() => {
 });
 
 
-const openEditModal = () => {
-    showEditModal.value = true;
-};
+// const openEditModal = () => { // Removed
+//     showEditModal.value = true;
+// };
 
 const handleEditSuccess = () => {
     fetchCRDDetails(); // Re-fetch details after edit
-    fetchCRDDescription();
+    // fetchCRDDescription(); // Removed
 };
 
 const updateBreadcrumb = () => {
@@ -129,26 +130,25 @@ const updateBreadcrumb = () => {
         } else {
             baseBreadcrumb = globalStore.breadcrumbItems.slice(0, crdsEntryIndex + 1);
         }
-
-        globalStore.setBreadcrumb([
+        globalStore.breadcrumbItems = [
             ...baseBreadcrumb,
             { label: crd.value.metadata.name, navigateTo: 'crddetail', params: { crdName: crd.value.metadata.name }, index: baseBreadcrumb.length }
-        ]);
+        ];
     }
 };
 
 
 onMounted(() => {
     fetchCRDDetails();
-    fetchCRDDescription();
+    // fetchCRDDescription(); // Removed
 });
 
 watch(() => route.params.crdName, (newVal, oldVal) => {
     if (newVal && newVal !== oldVal) {
         crd.value = null;
-        crdDescription.value = '';
+        // crdDescription.value = ''; // Removed
         fetchCRDDetails();
-        fetchCRDDescription();
+        // fetchCRDDescription(); // Removed
     }
 });
 
@@ -164,13 +164,13 @@ watch(() => route.params.crdName, (newVal, oldVal) => {
             <div class="flex justify-content-between align-items-center mb-3">
                 <h2 class="m-0">CRD: {{ crd.metadata.name }}</h2>
                 <div>
-                    <Button icon="pi pi-pencil" label="Edit" @click="openEditModal" class="p-button-info mr-2" />
-                    <Button icon="pi pi-refresh" @click="() => { fetchCRDDetails(); fetchCRDDescription(); }" :loading="loading || loadingDescription" v-tooltip.left="'Refresh'" />
+                    <EditResource :editCommand="`kubectl edit crd ${crdName}`" @command-run="handleEditSuccess" buttonText="Edit CRD" class="mr-2"/>
+                    <Button icon="pi pi-refresh" @click="fetchCRDDetails" :loading="loading" v-tooltip.left="'Refresh'" />
                 </div>
             </div>
 
             <TabView>
-                <TabPanel header="Details">
+                <TabPanel header="Details" value="details">
                     <Panel header="General" class="mb-3">
                         <div class="grid">
                             <div class="col-12 md:col-6"><strong>Kind:</strong> {{ crd.spec.names.kind }}</div>
@@ -217,43 +217,18 @@ watch(() => route.params.crdName, (newVal, oldVal) => {
                         </DataTable>
                     </Panel>
                 </TabPanel>
-                <TabPanel header="Describe">
-                    <DescribeViewer :description="crdDescription" :loading="loadingDescription" />
+                <TabPanel header="Describe" value="describe">
+                    <DescribeViewer :describeCommand="kubeCmds.describeCRDByName.replace('{{crdName}}', crdName)" />
                 </TabPanel>
-                 <TabPanel header="YAML">
-                    <EditResource
-                        :visible="showEditModal"
-                        resourceType="CustomResourceDefinition"
-                        :resourceName="crdName"
-                        :namespace="crd.spec.scope === 'Namespaced' ? crd.metadata.namespace : undefined"
-                        kind="CustomResourceDefinition"
-                        :resourceApiVersion="crd.apiVersion"
-                        @close="showEditModal = false"
-                        @success="handleEditSuccess"
-                    />
-                     <!-- Display read-only YAML if not editing -->
-                    <pre v-if="crd && !showEditModal" class="yaml-view">{{ JSON.stringify(crd, null, 2) }}</pre>
+                 <TabPanel header="YAML" value="yaml">
+                    <pre v-if="crd" class="yaml-view">{{ JSON.stringify(crd, null, 2) }}</pre>
                 </TabPanel>
             </TabView>
         </div>
         <div v-else-if="!loading">
             <Message severity="error">Could not load details for CRD: {{ crdName }}.</Message>
         </div>
-
-        <!-- Edit Modal will be part of the EditResource component itself if it's modal -->
-        <!-- Or use a Dialog component here if EditResource is not modal -->
-         <Dialog v-model:visible="showEditModal" modal header="Edit CRD" :style="{ width: '75vw' }">
-            <EditResource
-                :isModal="false"
-                resourceType="CustomResourceDefinition"
-                :resourceName="crdName"
-                :namespace="crd?.spec?.scope === 'Namespaced' ? crd?.metadata.namespace : undefined"
-                kind="CustomResourceDefinition"
-                :resourceApiVersion="crd?.apiVersion || 'apiextensions.k8s.io/v1'"
-                @close="showEditModal = false"
-                @success="handleEditSuccess"
-            />
-        </Dialog>
+        <!-- Dialog and internal EditResource removed -->
     </div>
 </template>
 
