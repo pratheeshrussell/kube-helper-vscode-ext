@@ -30,15 +30,17 @@ export class SidebarUIProvider implements vscode.WebviewViewProvider {
                     break;
                 }  
                 case MessageTypes.RUN_CMD_RESULT: {
-                    runCommand(data.command).then((result) => {
+                    runCommand(data.command).then((result) => { // data is the message from webview
                         webviewView.webview.postMessage({
-                            type: data.subType,
-                            data: result
+                            type: data.subType,    // The specific subtype (e.g., "getCRDs", "getSingleCRDElement")
+                            data: result,          // The actual command execution result {success, stdout, stderr, error}
+                            commandData: data.data // Echo back the original 'data' payload from the request for context
+                                                   // This allows components to identify which request this response belongs to
+                                                   // e.g. data.data might contain { resourceName: 'foo', namespace: 'bar' }
                         });
                     });
-                    
                     break;
-                }  
+                }
                 case MessageTypes.SHOW_DETAILS: {
                     const clusterName = data.clusterName;
                     const contextName = data.contextName;

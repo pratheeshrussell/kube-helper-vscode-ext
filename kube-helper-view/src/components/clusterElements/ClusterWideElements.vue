@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Namespaces from './elementList/Namespaces.vue';
 import ClusterNodes from './elementList/ClusterNodes.vue';
 import { globalStore } from '../../store/store';
@@ -14,6 +15,12 @@ import { kubeCmds } from '@src/constants/commands';
 
 const value = ref('ns');
 const isContext = ref(false);
+
+const router = useRouter();
+
+const navigateTo = (routeName: string) => {
+    router.push({ name: routeName });
+};
 
 const getEventsCmd = kubeCmds.getNamespacedResourceByType.replace("{{resType}}", 'events');
 
@@ -48,6 +55,7 @@ onMounted(() => {
                 <Tab value="crb">Cluster Role Bindings</Tab>
                 <Tab value="sc">Storage Classes</Tab>
                 <Tab value="ic">Ingress Classes</Tab>
+                <Tab value="crd">Custom Resource Definitions</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="ns">
@@ -77,12 +85,47 @@ onMounted(() => {
                 <TabPanel value="ic">
                     <IngressClassList />
                 </TabPanel>
+                <TabPanel value="crd">
+                    <div class="p-3 text-center">
+                        <p>View and manage Custom Resource Definitions.</p>
+                        <Button label="Go to CRDs" @click="navigateTo('crdlist')" />
+                    </div>
+                </TabPanel>
             </TabPanels>
         </Tabs>
     </div>
 </template>
 
 <style scoped>
+.cluster-over-view {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
 
+/* Ensure Tabs component itself takes full height if its parent (.cluster-over-view) is flex column */
+:deep(.p-tabs) {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
 
+:deep(.p-tabs-nav-content) {
+    flex-shrink: 0; /* Prevent nav from shrinking */
+}
+:deep(.p-tabs-panels) {
+    flex-grow: 1; /* Allow panels to take remaining height */
+    overflow-y: auto; /* Add scroll to panels if content overflows */
+    padding: 0 !important; /* Override default panel padding if components handle their own */
+    height: 100%; /* Fallback or if parent is not flex */
+}
+
+/* Ensure individual TabPanel and its direct child div take full height */
+:deep(.p-tabpanel) {
+    height: 100%;
+}
+
+:deep(.p-tabpanel > div:not(.text-center)) { /* Apply to component containers, not simple text divs */
+    height: 100%;
+}
 </style>
