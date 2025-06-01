@@ -48,3 +48,5 @@ export type KClusterConfig = {
     user: string | undefined;
     active:boolean;
 }
+export * from './crd.type';
+export * from './cr.type';

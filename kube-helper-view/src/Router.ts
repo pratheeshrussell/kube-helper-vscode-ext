@@ -5,6 +5,10 @@ import ClusterWideElements from "./components/clusterElements/ClusterWideElement
 import NamespaceElements from "./components/clusterElements/NamespaceElements.vue";
 import PodElement from "./components/clusterElements/PodElement.vue";
 import ContainerElement from "./components/clusterElements/ContainerElement.vue";
+import CRDList from "./components/clusterElements/elementList/CRDList.vue";
+import CRList from "./components/clusterElements/elementList/CRList.vue";
+import CRDElement from "./components/clusterElements/CRDElement.vue";
+import CRElement from "./components/clusterElements/CRElement.vue";
 import ServiceElement from "./components/clusterElements/ServiceElement.vue";
 import ConfigMapElement from "./components/clusterElements/ConfigMapElement.vue";
 import SecretElement from "./components/clusterElements/SecretElement.vue";
@@ -42,6 +46,11 @@ const routes:Readonly<RouteRecordRaw[]> = [
             {path: 'replset/:rsname', name: 'replsetoverview', component: ReplsetElement},
             {path: 'deployment/:depname', name: 'deploymentoverview', component: DeploymentElement},
             
+            // CRD and CR Routes
+            {path: 'crds', name: 'crdlist', component: CRDList},
+            {path: 'crd/:crdName/details', name: 'crddetail', component: CRDElement, props: true},
+            {path: 'crd/:crdName/resources', name: 'crlist', component: CRList, props: true},
+            {path: 'crd/:crdName/resource/:crName/:crNamespace?', name: 'crdetail', component: CRElement, props: true},
 
             {path: '', redirect: { name: 'clusteroverview' }},
         ]
