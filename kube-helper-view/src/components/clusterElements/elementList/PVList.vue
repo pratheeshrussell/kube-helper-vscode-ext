@@ -16,15 +16,17 @@
     <template #empty> No pv found. </template>
     <template #loading> Loading pv. Please wait. </template>
 
-    <Column v-if="!isNamespace" field="namespace" header="Namespace" style="min-width: 12rem">
+    <!-- <Column v-if="!isNamespace" field="namespace" header="Namespace" style="min-width: 12rem">
         <template #body="{ data }">
             <Button :label="data.namespace" variant="link" @click="gotoNamespaceDetails(data.namespace)" />
         </template>
-    </Column>
+    </Column> -->
     
     <Column field="name" header="Name" style="min-width: 12rem">
         <template #body="{ data }">
-            {{ data.name }}
+            <span class="selectable">
+                {{ data.name }}
+            </span>
         </template>
     </Column>
     <Column field="capacity" header="Capacity" style="min-width: 12rem">
@@ -86,7 +88,7 @@ import TimeAgo from 'javascript-time-ago';
 import { HelperUtils } from '../../../utils/helpers';
 
 import { globalStore } from '../../../store/store';
-import { useRouter } from 'vue-router';
+//import { useRouter } from 'vue-router';
 import type { PVListType, PVTableItem } from '@src/types/pv.type';
 
 const pvListData = ref<PVListType| null>(null);
@@ -97,7 +99,7 @@ const filters = ref({
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
 });
 const isNamespace = ref(false);
-const router = useRouter();
+//const router = useRouter();
 
 const getPvList = () => {
     loading.value = true;
@@ -109,9 +111,9 @@ const getPvList = () => {
     });
 }
 
-const gotoNamespaceDetails = (name: string) => {
-    router.push({name: 'namespaceoverview', params: {namespace: name}});
-}
+// const gotoNamespaceDetails = (name: string) => {
+//     router.push({name: 'namespaceoverview', params: {namespace: name}});
+// }
 
 
 

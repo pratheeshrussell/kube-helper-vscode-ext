@@ -21,7 +21,7 @@
             <Button :label="data.namespace" variant="link" @click="gotoNamespaceDetails(data.namespace)" />
         </template>
     </Column>
-    <Column field="lastSeen" header="Last seen" style="min-width: 12rem">
+    <Column field="lastSeenTime" sortable header="Last seen" style="min-width: 12rem">
         <template #body="{ data }">
             {{ data.lastSeen }}
         </template>
@@ -109,7 +109,8 @@ window.addEventListener('message', (event) => {
                     type: item.type || "-",
                     lastSeen: lastSeenAge,
                     lastTimestamp: timeStamp,
-                    message: item.message || "-"
+                    message: item.message || "-",
+                    lastSeenTime: new Date(timeStamp)
                 } as EventTableItem
             });
             eventTableData.value = [...tData];

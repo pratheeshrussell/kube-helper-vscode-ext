@@ -98,6 +98,7 @@ export type EventType = {
   export type EventTableItem = {
     lastSeen: string;
     lastTimestamp: string;
+    lastSeenTime: Date;
     type: string;
     reason: string;
     object: string;

@@ -24,7 +24,9 @@
     
     <Column field="name" header="Name" style="min-width: 12rem">
         <template #body="{ data }">
-            {{ data.name }}
+            <span class="selectable">
+                {{ data.name }}
+            </span>
         </template>
     </Column>
     <Column field="status" header="Status" style="min-width: 12rem">
