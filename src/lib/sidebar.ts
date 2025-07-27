@@ -18,7 +18,9 @@ export class SidebarUIProvider implements vscode.WebviewViewProvider {
             // Allow scripts in the webview
             enableScripts: true,
             localResourceRoots: [this._extensionUri],
+            
         };
+
         
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
         
@@ -26,7 +28,7 @@ export class SidebarUIProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(async (data) => {
             switch (data.type) {
                 case MessageTypes.VIEW_READY: {
-                    vscode.window.showInformationMessage('Sidebar active');  
+                    vscode.window.showInformationMessage('Kube helper sidebar active');  
                     break;
                 }  
                 case MessageTypes.RUN_CMD_RESULT: {

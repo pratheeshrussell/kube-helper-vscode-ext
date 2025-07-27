@@ -7,6 +7,8 @@ import type { KClusterConfig, KConfig } from '@apptypes/cluster.type';
 
 const kubeConfig = ref<null | KConfig>(null);
 const kubeContexts = ref<null | KClusterConfig[]>(null);
+
+const isError = ref(false);
 const getClusterDetails = () => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
@@ -17,6 +19,12 @@ const getClusterDetails = () => {
 
 window.addEventListener('message', (event) => {
     if(event.data.type == "clusterDetails"){
+        console.log("Cluster Details",event.data.data);
+        if(event.data?.data?.error){
+            isError.value = true;
+            return;
+        }
+        isError.value = false;
         // TODO: Handle error
         const configDetails = JSON.parse(event.data.data) as KConfig;
         if(configDetails?.clusters?.length > 0){
@@ -57,7 +65,16 @@ onMounted(() => {
 
 <template>
     <div class="sidebar">
-        <template v-if="!kubeContexts || kubeContexts.length == 0">
+        <template v-if="isError">
+            <div class="error">
+                <div>Error fetching cluster details</div>
+                <div class="my-2">Is kubectl installed and available in env path?</div>
+                <div class="d-flex justify-content-center align-items-center">
+                    <Button label="Retry" @click="getClusterDetails" size="small" class="text-nowrap"></Button>
+                </div>
+            </div>
+        </template>
+        <template v-else-if="!kubeContexts || kubeContexts.length == 0">
             <div class="no-contexts">No contexts found</div>
         </template>
         <template v-else>

@@ -34,6 +34,22 @@
           "icon": "assets/images/kube-helper.svg"
         }
       ]
+    },
+    "commands": [
+      {
+        "command": "kube-helper.context-refresh",
+        "title": "Refresh Context",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "kube-helper.context-refresh",
+          "when": "view == kube-helper-sidebar",
+          "group": "navigation"
+        }
+      ]
     }
   },
   "scripts": {
