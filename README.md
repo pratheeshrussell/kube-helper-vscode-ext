@@ -28,6 +28,7 @@ code --install-extension  kube-helper-0.0.1.vsix
 * View logs directly in VSCode
 * Exec into Containers
 * Port forward resources
+* Create Debug Pods
 
 ![list namespaces](docs/feat_img_1.png)
 ![namespace details](docs/feat_img_3.png)

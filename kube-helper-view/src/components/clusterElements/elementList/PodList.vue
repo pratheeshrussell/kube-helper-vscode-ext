@@ -9,8 +9,11 @@
                 </InputIcon>
                 <InputText v-model="filters['global'].value" placeholder="Global Search" />
             </IconField>
-
+            
             <RefreshData :reloadFunction="getPodList" />
+        </div>
+        <div v-if="isNamespace" class="d-flex justify-content-end my-3">
+            <RunDebugPod />
         </div>
     </template>
     <template #empty> No pods found. </template>
@@ -70,6 +73,7 @@ import { HelperUtils } from '../../../utils/helpers';
 import { globalStore } from '../../../store/store';
 import { useRouter } from 'vue-router';
 import type { PodListType, PodTableItem } from '@src/types/podList.type';
+import RunDebugPod from '../../common/RunDebugPod.vue';
 
 const podListData = ref<PodListType| null>(null);
 const podTableData = ref<PodTableItem[]>([]);

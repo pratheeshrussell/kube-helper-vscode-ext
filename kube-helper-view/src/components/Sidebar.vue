@@ -19,7 +19,6 @@ const getClusterDetails = () => {
 
 window.addEventListener('message', (event) => {
     if(event.data.type == "clusterDetails"){
-        console.log("Cluster Details",event.data.data);
         if(event.data?.data?.error){
             isError.value = true;
             return;

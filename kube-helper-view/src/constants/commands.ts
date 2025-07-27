@@ -18,4 +18,7 @@ export const kubeCmds = {
     
     portfwdPod: "kubectl port-forward {{podname}} {{portmapping}} {{namespace}} {{context}}",
     portfwdSvc: "kubectl port-forward svc/{{svcname}} {{portmapping}} {{namespace}} {{context}}",
+
+    runDebugPod: "kubectl run -i --tty --rm {{podName}} --image={{image}} --restart=Never {{namespace}} {{context}} --command -- {{command}}",
+
 } as const;

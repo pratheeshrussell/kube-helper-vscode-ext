@@ -17,6 +17,8 @@ import Dialog from 'primevue/dialog';
 import RadioButton from 'primevue/radiobutton';
 import InputNumber from 'primevue/inputnumber';
 import Checkbox from 'primevue/checkbox';
+import Select from 'primevue/select';
+import Textarea from 'primevue/textarea';
 
 
 import RefreshData from "../components/common/RefreshData.vue";
@@ -36,7 +38,7 @@ export const loadPrimeComponents = (app: App<Element>) => {
         DataTable, Column, InputText, InputIcon, Checkbox,
         IconField, Button,Tabs, TabList, Tab, InputNumber,
         TabPanels, TabPanel,DataView, Dialog,RadioButton,
-        RefreshData,VAceEditor
+        RefreshData,VAceEditor,Select, Textarea
     }
     
     Object.entries(components).forEach(([key, value]) => {

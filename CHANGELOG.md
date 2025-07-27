@@ -4,8 +4,10 @@ All notable changes to the "kube-helper" extension will be documented in this fi
 
 ## [0.0.1]
 
-- Initial release
-- Lists Pods, services, containers
-- allows exec into pods and containers
-- allows to portforward into pods and services
-- shows logs for pods, services and containers
+### Added
+- List Resources like Pods, services, etc., in a cluster
+- Edit definition of resources like pods, deployments from VSCode
+- View logs directly in VSCode
+- Exec into Containers
+- Port forward resources
+- Create Debug Pods
