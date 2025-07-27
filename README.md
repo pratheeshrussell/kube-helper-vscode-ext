@@ -10,6 +10,13 @@ If you find this extension helpful (or just want to support the idea), giving th
 
 
 ## 📦 How to install
+You can install the extension from the VSCode marketplace or download the vsix file from Releases and install it manually.
+
+### From VSCode Marketplace
+Search for "Kube Helper" in the VSCode marketplace and install it.
+
+### From Releases
+
 Download the vsix file from Releases [![Install Extension](https://img.shields.io/badge/Install-Download%20VSIX-blue?logo=visualstudiocode&logoColor=white)](https://github.com/pratheeshrussell/kube-helper-vscode-ext/releases)
 
 Run the following command to install the downloaded vsix file
