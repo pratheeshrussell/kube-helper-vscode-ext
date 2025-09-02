@@ -18,9 +18,7 @@
 
     <Column field="name" header="Name" style="min-width: 12rem">
         <template #body="{ data }">
-            <span class="selectable">
-                {{ data.name }}
-            </span>
+            <Button :label="data.name" class="selectable" variant="link" @click="gotoNodeDetails(data)" />
         </template>
     </Column>
     <Column field="status" header="Status" style="min-width: 12rem">
@@ -56,6 +54,7 @@ import { MessageTypes } from '@common/messageTypes';
 import TimeAgo from 'javascript-time-ago';
 import type { ClusterNodeTableData, ClusterNodeType } from '../../../types/clustertype.type';
 import { HelperUtils } from '../../../utils/helpers';
+import { useRouter } from 'vue-router';
 
 
 const nodeData = ref<ClusterNodeType| null>(null);
@@ -65,6 +64,7 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
 });
+const router = useRouter();
 
 const getNodeDetails = () => {
     loading.value = true;
@@ -74,6 +74,10 @@ const getNodeDetails = () => {
         command: HelperUtils.prepareCommand(kubeCmds
         .getNonNamespacedResourceByType.replace("{{resType}}", 'nodes'))
     });
+}
+
+const gotoNodeDetails = (data: ClusterNodeTableData) => {
+    router.push({name: 'nodeoverview', params: {nodename: data.name}});
 }
 
 window.addEventListener('message', (event) => {

@@ -4,6 +4,7 @@ import ClusterView from "./components/ClusterView.vue";
 import ClusterWideElements from "./components/clusterElements/ClusterWideElements.vue";
 import NamespaceElements from "./components/clusterElements/NamespaceElements.vue";
 import PodElement from "./components/clusterElements/PodElement.vue";
+import NodeElement from "./components/clusterElements/NodeElement.vue";
 import ContainerElement from "./components/clusterElements/ContainerElement.vue";
 import ServiceElement from "./components/clusterElements/ServiceElement.vue";
 import ConfigMapElement from "./components/clusterElements/ConfigMapElement.vue";
@@ -42,6 +43,7 @@ const routes:Readonly<RouteRecordRaw[]> = [
             {path: 'replset/:rsname', name: 'replsetoverview', component: ReplsetElement},
             {path: 'deployment/:depname', name: 'deploymentoverview', component: DeploymentElement},
             
+            {path: 'node/:nodename', name: 'nodeoverview', component: NodeElement},
 
             {path: '', redirect: { name: 'clusteroverview' }},
         ]

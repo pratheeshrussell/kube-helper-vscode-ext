@@ -21,4 +21,5 @@ export const kubeCmds = {
 
     runDebugPod: "kubectl run -i --tty --rm {{podName}} --image={{image}} --restart=Never {{namespace}} {{context}} --command -- {{command}}",
 
+    nodeDebugPod: "kubectl debug node/{{nodename}} -it --image={{image}} {{context}}",
 } as const;

@@ -43,7 +43,7 @@
     </Column>
     <Column field="message" header="Message" style="min-width: 12rem">
         <template #body="{ data }">
-            {{ data.message }}
+            <span class="selectable">{{ data.message }}</span>
         </template>
     </Column>
     </DataTable>
