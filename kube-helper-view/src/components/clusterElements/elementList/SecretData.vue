@@ -69,28 +69,38 @@ const getSecretData = () => {
 window.addEventListener('message', (event) => {
     loading.value = false;
     if(event.data.type == "secretData"){
-        
-        // TODO: Handle error
-        const decodeBase64 = (datastr: string) => {
-            try {
-                return atob(datastr);
-            } catch (_e) {
-                return '';
-            }
+        if (event.data.data && event.data.data.error) {
+            console.error("Error fetching secret data:", event.data.data.errormessage || event.data.data.message);
+            secretTableData.value = [];
+            secretListData.value = null;
+            return;
         }
-        const configDetails = JSON.parse(event.data.data) as SecretType;
-        if(configDetails?.data && Object.keys(configDetails.data).length > 0){
-            const tData = Object.entries(configDetails.data).map(([key, value]) => {
-                const decodedValue = decodeBase64(value);
-                return {
-                    key: key,
-                    value: value,
-                    decodedValue: decodedValue
-                } as SecretDataTableItem;
-            });
-            secretTableData.value = [...tData];
-            secretListData.value = configDetails;
-        }else{
+        try {
+            const decodeBase64 = (datastr: string) => {
+                try {
+                    return atob(datastr);
+                } catch (_e) {
+                    return '';
+                }
+            }
+            const configDetails = JSON.parse(event.data.data) as SecretType;
+            if(configDetails?.data && Object.keys(configDetails.data).length > 0){
+                const tData = Object.entries(configDetails.data).map(([key, value]) => {
+                    const decodedValue = decodeBase64(value);
+                    return {
+                        key: key,
+                        value: value,
+                        decodedValue: decodedValue
+                    } as SecretDataTableItem;
+                });
+                secretTableData.value = [...tData];
+                secretListData.value = configDetails;
+            }else{
+                secretTableData.value = [];
+                secretListData.value = null;
+            }
+        } catch (error) {
+            console.error("Failed to parse secret data:", event.data.data, error);
             secretTableData.value = [];
             secretListData.value = null;
         }

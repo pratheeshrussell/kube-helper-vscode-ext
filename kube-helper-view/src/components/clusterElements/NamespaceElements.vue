@@ -45,7 +45,7 @@ onMounted(() => {
         <div>Unable to load namespace details</div>
     </div>
     <div class="ns-over-view" v-if="isNamespace">
-        <Tabs v-model:value="value" scrollable>
+        <Tabs v-model:value="value" scrollable lazy>
             <TabList>
                 <Tab value="pods">Pods</Tab>
                 <Tab value="svcs">Services</Tab>

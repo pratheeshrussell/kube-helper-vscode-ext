@@ -37,7 +37,7 @@ onMounted(() => {
         <div>Unable to load cluster details</div>
     </div>
     <div class="cluster-over-view" v-if="isContext">
-        <Tabs v-model:value="value" scrollable>
+        <Tabs v-model:value="value" scrollable lazy>
             <TabList>
                 <Tab value="ns">Namespaces</Tab>
                 <Tab value="nodes">Nodes</Tab>

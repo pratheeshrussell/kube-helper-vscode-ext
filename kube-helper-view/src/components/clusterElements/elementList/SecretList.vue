@@ -97,27 +97,38 @@ const gotoSecretDetails = (data: SecretTableItem) => {
 window.addEventListener('message', (event) => {
     loading.value = false;
     if(event.data.type == "secretList"){
-        // TODO: Handle error
-        const configDetails = JSON.parse(event.data.data) as SecretListType;
-        
-        if(configDetails?.items && configDetails?.items?.length > 0){
-            const timeAgo = new TimeAgo('en-US');
-            const tData = configDetails.items.map((item:SecretType) => {
-                const timeStamp = item?.metadata?.creationTimestamp || (new Date()).toISOString();
-                const age = timeAgo.format(new Date(timeStamp));
-                
-                return {
-                    age: age,
-                    timestamp: timeStamp,
-                    name: item?.metadata?.name || '',
-                    dataCount: item?.data ? Object.keys(item.data).length : 0,
-                    namespace: item?.metadata?.namespace || 'default',
-                    type: item?.type || 'Opaque',
-                } as SecretTableItem
-            });
-            secretTableData.value = [...tData];
-            secretListData.value = configDetails;
-        }else{
+        if (event.data.data && event.data.data.error) {
+            console.error("Error fetching secret list:", event.data.data.errormessage || event.data.data.message);
+            secretTableData.value = [];
+            secretListData.value = null;
+            return;
+        }
+        try {
+            const configDetails = JSON.parse(event.data.data) as SecretListType;
+            
+            if(configDetails?.items && configDetails?.items?.length > 0){
+                const timeAgo = new TimeAgo('en-US');
+                const tData = configDetails.items.map((item:SecretType) => {
+                    const timeStamp = item?.metadata?.creationTimestamp || (new Date()).toISOString();
+                    const age = timeAgo.format(new Date(timeStamp));
+                    
+                    return {
+                        age: age,
+                        timestamp: timeStamp,
+                        name: item?.metadata?.name || '',
+                        dataCount: item?.data ? Object.keys(item.data).length : 0,
+                        namespace: item?.metadata?.namespace || 'default',
+                        type: item?.type || 'Opaque',
+                    } as SecretTableItem
+                });
+                secretTableData.value = [...tData];
+                secretListData.value = configDetails;
+            }else{
+                secretTableData.value = [];
+                secretListData.value = null;
+            }
+        } catch (error) {
+            console.error("Failed to parse secret list:", event.data.data, error);
             secretTableData.value = [];
             secretListData.value = null;
         }
