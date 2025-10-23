@@ -34,7 +34,7 @@ export default class CreateClusterDetailsPanelUI {
             if (data.type === MessageTypes.RUN_CMD_TERMINAL) {
                 // open terminal and run command
                 runCommandTerminal(data.command);
-            }else if (data.type === MessageTypes.RUN_CMD_RESULT) {
+            } else if (data.type === MessageTypes.RUN_CMD_RESULT) {
               // Run command and return result
               runCommand(data.command).then((result) => {
                 panel.webview.postMessage({
@@ -42,8 +42,40 @@ export default class CreateClusterDetailsPanelUI {
                     data: result
                 });
             });
+            } else if (data.type === MessageTypes.GET_GRAPH_RESOURCES) {
+                const namespace = data.namespace;
+                const context = data.context;
+                // --context=${globalStore.context}
+                runCommand(`kubectl api-resources --namespaced=true -o name --context=${context}`).then(apiResult => {
+                    if (typeof apiResult !== 'string' || apiResult.includes('error')) {
+                        panel.webview.postMessage({ type: MessageTypes.GRAPH_RESOURCES_RESULT, data: {} });
+                        return;
+                    }
+                    const resourceTypes = apiResult.split(/\s+/).filter(Boolean);
+                    const promises = resourceTypes.map(rt => runCommand(`kubectl get ${rt} -n ${namespace} --context=${context} -o json`));
+                    Promise.all(promises).then(results => {
+                        const resources: Record<string, any> = {};
+                        results.forEach((result, index) => {
+                            const resourceType = resourceTypes[index];
+                            try {
+                                if (typeof result === 'string' && !result.startsWith('error')) {
+                                    resources[resourceType] = JSON.parse(result);
+                                } else {
+                                    resources[resourceType] = { items: [] };
+                                }
+                            } catch (e) {
+                                resources[resourceType] = { items: [] };
+                            }
+                        });
+                        panel.webview.postMessage({ type: MessageTypes.GRAPH_RESOURCES_RESULT, data: resources });
+                    });
+                });
+            } else if (data.type === MessageTypes.DESCRIBE_RESOURCE) {
+                const { resourceType, resourceName, namespace } = data;
+                runCommand(`kubectl describe ${resourceType} ${resourceName} -n ${namespace}`).then(result => {
+                    panel.webview.postMessage({ type: MessageTypes.DESCRIBE_RESOURCE_RESULT, data: result });
+                });
             }
-            console.log("message received in panel",data);
           });
           // Set the HTML content in the webview panel
           panel.webview.html = this.getPanelTemplateHTML(panel.webview);
