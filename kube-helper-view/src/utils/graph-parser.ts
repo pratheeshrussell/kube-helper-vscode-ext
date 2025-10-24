@@ -1,9 +1,8 @@
-import { DataSet } from 'vis-network/standalone';
-import type { VisNode, VisEdge, K8sResourceList } from '../types/graph.type';
+import type { VueFlowNode, VueFlowEdge, K8sResourceList } from '../types/graph.type';
 
-export function parseGraphData(resources: Record<string, K8sResourceList>): { nodes: VisNode[], edges: VisEdge[] } {
-    const nodes = new DataSet<VisNode>();
-    const edges = new DataSet<VisEdge>();
+export function parseGraphData(resources: Record<string, K8sResourceList>): { nodes: VueFlowNode[], edges: VueFlowEdge[] } {
+    const nodes: VueFlowNode[] = [];
+    const edges: VueFlowEdge[] = [];
     const allItems: any[] = [];
 
     const ignoreResources = ['event'];
@@ -13,15 +12,19 @@ export function parseGraphData(resources: Record<string, K8sResourceList>): { no
         if (list && list.items) {
             list.items.forEach((item: any) => {
 
-                if(ignoreResources.includes(item.kind.toLowerCase())){
+                if (ignoreResources.includes(item.kind.toLowerCase())) {
                     return;
                 }
                 allItems.push(item);
-                nodes.add({
+                nodes.push({
                     id: `${item.kind}/${item.metadata.name}`,
-                    label: `${item.metadata.name}\n${item.kind}`,
-                    shape: 'box',
-                    resourceType: item.kind.toLowerCase(),
+                    data: {
+                        resourceType: item.kind.toLowerCase(),
+                        name: item.metadata.name,
+
+                    },
+                    position: { x: Math.random() * 400, y: Math.random() * 400 },
+                    type: 'custom',
                 });
             });
         }
@@ -36,8 +39,8 @@ export function parseGraphData(resources: Record<string, K8sResourceList>): { no
             item.metadata.ownerReferences.forEach((owner: any) => {
                 const toId = `${owner.kind}/${owner.name}`;
                 // Check if owner node exists to avoid dangling edges
-                if (nodes.get(toId)) {
-                    edges.add({ from: toId, to: fromId, arrows: 'to' });
+                if (nodes.find(n => n.id === toId)) {
+                    edges.push({ id: `${fromId}-${toId}`, source: toId, target: fromId, animated: true, markerEnd: 'arrowclosed' });
                 }
             });
         }
@@ -45,8 +48,17 @@ export function parseGraphData(resources: Record<string, K8sResourceList>): { no
         // Generic Label Selection: Connect resources with selectors to matching resources
         if (item.spec?.selector) {
             const selector = item.spec.selector;
+
             // Find all items that match this selector
             const matchingItems = allItems.filter(potentialMatch => {
+                // service should link with pod
+                if(item.kind.toLowerCase() === 'service' ) {
+                    if(potentialMatch.kind.toLowerCase() !== 'pod') {
+                        return false;
+                    }
+                }
+
+                
                 if (potentialMatch.metadata?.labels) {
                     return Object.entries(selector).every(([key, value]) => potentialMatch.metadata.labels[key] === value);
                 }
@@ -54,7 +66,7 @@ export function parseGraphData(resources: Record<string, K8sResourceList>): { no
             });
             matchingItems.forEach(match => {
                 const toId = `${match.kind}/${match.metadata.name}`;
-                edges.add({ from: fromId, to: toId, arrows: 'to' });
+                edges.push({ id: `${fromId}-${toId}`, source: fromId, target: toId, animated: true, markerEnd: 'arrowclosed' });
             });
         }
 
@@ -63,20 +75,57 @@ export function parseGraphData(resources: Record<string, K8sResourceList>): { no
         if (item.kind === 'Pod' && item.spec.volumes) {
             item.spec.volumes.forEach((volume: any) => {
                 if (volume.configMap) {
-                    edges.add({ from: fromId, to: `ConfigMap/${volume.configMap.name}`, arrows: 'to' });
+                    edges.push({ id: `${fromId}-cm-${volume.configMap.name}`, source: fromId, target: `ConfigMap/${volume.configMap.name}`, animated: true, markerEnd: 'arrow' });
                 }
                 if (volume.secret) {
-                    edges.add({ from: fromId, to: `Secret/${volume.secret.secretName}`, arrows: 'to' });
+                    edges.push({ id: `${fromId}-secret-${volume.secret.secretName}`, source: fromId, target: `Secret/${volume.secret.secretName}`, animated: true, markerEnd: 'arrow' });
                 }
                 if (volume.persistentVolumeClaim) {
-                    edges.add({ from: fromId, to: `PersistentVolumeClaim/${volume.persistentVolumeClaim.claimName}`, arrows: 'to' });
+                    edges.push({ id: `${fromId}-pvc-${volume.persistentVolumeClaim.claimName}`, source: fromId, target: `PersistentVolumeClaim/${volume.persistentVolumeClaim.claimName}`, animated: true, markerEnd: 'arrow' });
                 }
             });
         }
 
         // Pod -> ServiceAccount
         if (item.kind === 'Pod' && item.spec.serviceAccountName) {
-            edges.add({ from: fromId, to: `ServiceAccount/${item.spec.serviceAccountName}`, arrows: 'to' });
+            edges.push({ id: `${fromId}-sa-${item.spec.serviceAccountName}`, source: fromId, target: `ServiceAccount/${item.spec.serviceAccountName}`, animated: true, markerEnd: 'arrow' });
+        }
+
+        // Pod -> Environment Variables (ConfigMap, Secret)
+        if (item.kind === 'Pod' && (item.spec.containers || item.spec.initContainers)) {
+            const processContainerEnv = (container: any) => {
+                // envFrom
+                if (container.envFrom) {
+                    container.envFrom.forEach((envFromSource: any) => {
+                        if (envFromSource.configMapRef) {
+                            edges.push({ id: `${fromId}-envFrom-cm-${envFromSource.configMapRef.name}`, source: fromId, target: `ConfigMap/${envFromSource.configMapRef.name}`, animated: true, markerEnd: 'arrow' });
+                        }
+                        if (envFromSource.secretRef) {
+                            edges.push({ id: `${fromId}-envFrom-secret-${envFromSource.secretRef.name}`, source: fromId, target: `Secret/${envFromSource.secretRef.name}`, animated: true, markerEnd: 'arrow' });
+                        }
+                    });
+                }
+                // env with valueFrom
+                if (container.env) {
+                    container.env.forEach((envVar: any) => {
+                        if (envVar.valueFrom) {
+                            if (envVar.valueFrom.configMapKeyRef) {
+                                edges.push({ id: `${fromId}-env-cm-${envVar.valueFrom.configMapKeyRef.name}`, source: fromId, target: `ConfigMap/${envVar.valueFrom.configMapKeyRef.name}`, animated: true, markerEnd: 'arrow' });
+                            }
+                            if (envVar.valueFrom.secretKeyRef) {
+                                edges.push({ id: `${fromId}-env-secret-${envVar.valueFrom.secretKeyRef.name}`, source: fromId, target: `Secret/${envVar.valueFrom.secretKeyRef.name}`, animated: true, markerEnd: 'arrow' });
+                            }
+                        }
+                    });
+                }
+            };
+
+            if (item.spec.containers) {
+                item.spec.containers.forEach(processContainerEnv);
+            }
+            if (item.spec.initContainers) {
+                item.spec.initContainers.forEach(processContainerEnv);
+            }
         }
 
         // Ingress -> Service
@@ -84,12 +133,13 @@ export function parseGraphData(resources: Record<string, K8sResourceList>): { no
             item.spec.rules.forEach((rule: any) => {
                 rule.http?.paths.forEach((path: any) => {
                     if (path.backend?.service?.name) {
-                        edges.add({ from: fromId, to: `Service/${path.backend.service.name}`, arrows: 'to' });
+                        edges.push({ id: `${fromId}-svc-${path.backend.service.name}`, source: fromId, target: `Service/${path.backend.service.name}`, animated: true, markerEnd: 'arrow' });
                     }
                 });
             });
         }
     });
 
-    return { nodes: nodes.get(), edges: edges.get() };
+    return { nodes, edges };
 }
+

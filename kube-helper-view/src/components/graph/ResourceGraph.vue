@@ -1,33 +1,69 @@
 <template>
-    <div ref="graphContainer" class="resource-graph-container"></div>
+    <VueFlow :nodes="nodes" :edges="edges" :fit-view-on-init="true">
+        <Controls position="top-left" />
+        <template #node-custom="props">
+            <ResourceGraphNode :id="props.id" :data="props.data" />
+        </template>
+    </VueFlow>
     <Dialog v-model:visible="isDescribeVisible" header="Resource Details" modal :style="{ width: '75vw' }">
         <pre>{{ describeOutput }}</pre>
     </Dialog>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import { Network } from 'vis-network';
-import { DataSet } from 'vis-data/peer';
+import { onMounted, ref } from 'vue';
+import { VueFlow, useVueFlow } from '@vue-flow/core';
+import { Controls } from '@vue-flow/controls';
 import { MessageTypes } from '@common/messageTypes';
 import { globalStore } from '../../store/store';
 import { parseGraphData } from '../../utils/graph-parser';
-import { getThemeOptions } from '../../utils/graph-theme';
-import type { VisNode, VisEdge } from '../../types/graph.type';
+import type { Node, Edge } from '@vue-flow/core';
+import ELK from 'elkjs/lib/elk.bundled.js';
+import ResourceGraphNode from './ResourceGraphNode.vue';
 
-const graphContainer = ref<HTMLElement | null>(null);
+import '@vue-flow/controls/dist/style.css'
+import { EDGE_STYLE } from './graphConstants';
+import { HelperUtils } from '@src/utils/helpers';
+
+const nodes = ref<Node[]>([]);
+const edges = ref<Edge[]>([]);
 const isDescribeVisible = ref(false);
 const describeOutput = ref('');
-let network: Network | null = null;
-const nodes = ref<DataSet<VisNode>>(new DataSet<VisNode>());
-const edges = ref<DataSet<VisEdge>>(new DataSet<VisEdge>());
 
-const props = defineProps({
-    active: {
-        type: Boolean,
-        required: true,
-    }
-});
+
+const { onNodeClick, onPaneClick, getConnectedEdges } = useVueFlow();
+
+const elk = new ELK();
+
+const getLayoutedElements = async (nodes: Node[], edges: Edge[]) => {
+    const graph = {
+        id: 'root',
+        layoutOptions: { 'elk.algorithm': 'layered', 'elk.direction': 'DOWN' },
+        children: nodes.map((node) => ({
+            id: node.id,
+            width: (HelperUtils.approximateTextWidth(node.data.name, node.data.resourceType) + 20), // approximate width of your nodes
+            height: 120, // approximate height of your nodes
+        })),
+        edges: edges.map((edge) => ({
+            id: edge.id,
+            sources: [edge.source],
+            targets: [edge.target]
+        })),
+    };
+
+    const { children } = await elk.layout(graph);
+
+    return {
+        nodes: nodes.map((node) => {
+            const layoutNode = children?.find((n) => n.id === node.id);
+            return {
+                ...node,
+                position: { x: layoutNode?.x || 0, y: layoutNode?.y || 0 },
+            };
+        }),
+        edges: edges,
+    };
+};
 
 const getGraphData = () => {
     tsvscode?.postMessage({
@@ -37,23 +73,24 @@ const getGraphData = () => {
     });
 };
 
-const describeResource = (resourceType: string, resourceName: string) => {
-    tsvscode?.postMessage({
-        type: MessageTypes.DESCRIBE_RESOURCE,
-        resourceType,
-        resourceName,
-        namespace: globalStore.namespace,
-    });
-};
+// const describeResource = (resourceType: string, resourceName: string) => {
+//     tsvscode?.postMessage({
+//         type: MessageTypes.DESCRIBE_RESOURCE,
+//         resourceType,
+//         resourceName,
+//         namespace: globalStore.namespace,
+//     });
+// };
 
-window.addEventListener('message', (event) => {
+window.addEventListener('message', async (event) => {
     if (event.data.type === MessageTypes.GRAPH_RESOURCES_RESULT) {
-        const parsedData = parseGraphData(event.data.data);
-        nodes.value.clear();
-        nodes.value.add(parsedData.nodes);
-        edges.value.clear();
-        edges.value.add(parsedData.edges);
-        createGraph();
+        const { nodes: parsedNodes, edges: parsedEdges } = parseGraphData(event.data.data);
+        const layoutedElements = await getLayoutedElements(parsedNodes, parsedEdges);
+        nodes.value = layoutedElements.nodes;
+        edges.value = layoutedElements.edges.map((edge) => ({
+            ...edge,
+            style: { ...EDGE_STYLE.default }
+        }));
     }
     if (event.data.type === MessageTypes.DESCRIBE_RESOURCE_RESULT) {
         describeOutput.value = event.data.data;
@@ -61,101 +98,49 @@ window.addEventListener('message', (event) => {
     }
 });
 
-const createGraph = () => {
-    if (graphContainer.value) {
-        const data = { nodes: nodes.value, edges: edges.value };
-        const theme = document.body.getAttribute('data-theme') === '1' ?  'light': 'dark';
-        const options = getThemeOptions(theme);
-        network = new Network(graphContainer.value, data, options);
+onNodeClick((event) => {
+    const node = event.node;
+    if (!node) return;
 
-        network.on('click', (params) => {
-            const allEdges = edges.value.get({ returnType: 'Array' }) as VisEdge[];
-            if (params.nodes.length > 0) {
-                const nodeId = params.nodes[0];
-                const node = nodes.value.get(nodeId) as unknown as VisNode;
-                if (node) {
-                    describeResource(node.resourceType, node.label.split('\n')[0]);
-                }
-                if (!network) return;
-                const connectedEdges = network.getConnectedEdges(nodeId);
-                const updates = allEdges.map((edge: VisEdge) => ({
-                    id: edge.id,
-                    arrows: connectedEdges.includes(edge.id as any) ? 'to' : ''
-                }));
-                edges.value.update(updates as any);
-            } else {
-                const updates = allEdges.map((edge: VisEdge) => ({
-                    id: edge.id,
-                    arrows: 'to'
-                }));
-                edges.value.update(updates as any);
+    // TODO: move this to node template
+    // if (typeof node.data.name === 'string') {
+    //     describeResource(node.data.resourceType, node.data.name);
+    // }
+
+    const connectedEdges = getConnectedEdges(node.id);
+    edges.value = edges.value.map((edge) => {
+        if (connectedEdges.some(e => e.id === edge.id)) {
+            return {
+                ...edge,
+                style: { ...EDGE_STYLE.selected }
             }
-        });
-    }
-};
+        }
+        return {
+            ...edge,
+            style: { ...EDGE_STYLE.default }
+        }
+    });
+});
 
-watch(() => props.active, (isActive) => {
-    if (isActive && !network) {
-        getGraphData();
-    }
+onPaneClick(() => {
+    edges.value = edges.value.map((edge) => ({
+        ...edge,
+        style: {...EDGE_STYLE.default}
+    }));
 });
 
 onMounted(() => {
-    if (props.active) {
-        getGraphData();
-    }
+    getGraphData();
 });
 </script>
 
-<style scoped>
-.resource-graph-container {
+<style>
+@import '@vue-flow/core/dist/style.css';
+@import '@vue-flow/core/dist/theme-default.css';
+
+.vue-flow {
     height: 100vh;
     width: 100%;
 }
-/* Viz Controls */
-
-::v-deep(div.vis-network div.vis-navigation div.vis-button.vis-up) {
-    top: 10px;
-    left: 55px;
-    background-image: url('images/arrow-up.png');
-}
-
-::v-deep(div.vis-network div.vis-navigation div.vis-button.vis-down) {
-    top: 50px;
-    left: 55px;
-    background-image: url('images/arrow-down.png');
-}
-
-::v-deep(div.vis-network div.vis-navigation div.vis-button.vis-left) {
-    top: 10px;
-    left: 15px;
-    background-image: url('images/arrow-left.png');
-}
-
-::v-deep(div.vis-network div.vis-navigation div.vis-button.vis-right) {
-    top: 10px;
-    left: 95px;
-    background-image: url('images/arrow-right.png');
-}
-
-
-::v-deep(div.vis-network div.vis-navigation div.vis-button.vis-zoomIn) {
-    top: 10px;
-    right: 15px;
-    background-image: url('images/zoom-in.png');
-}
-
-::v-deep(div.vis-network div.vis-navigation div.vis-button.vis-zoomOut) {
-    top: 10px;
-    right: 55px;
-    background-image: url('images/zoom-out.png');
-}
-
-::v-deep(div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends) {
-    top: 50px;
-    right: 15px;
-    background-image: url('images/zoom-extend.png');
-}
-
-
 </style>
+

@@ -1,16 +1,7 @@
-export interface VisNode {
-    id: string;
-    label: string;
-    shape: string;
-    resourceType: string;
-}
+import type { Node, Edge } from '@vue-flow/core';
 
-export interface VisEdge {
-    id?: string | number;
-    from: string;
-    to: string;
-    arrows: string;
-}
+export type VueFlowNode = Node;
+export type VueFlowEdge = Edge;
 
 export interface K8sResource {
     apiVersion: string;
