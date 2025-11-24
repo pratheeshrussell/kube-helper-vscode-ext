@@ -1,36 +1,38 @@
 <template>
-    <DataTable v-model:expandedRows="expandedRows" :value="secretTableData" v-model:filters="filters"
-    paginator :rows="5" dataKey="key" filterDisplay="row" :loading="loading">
-    <template #header>
-        <div class="d-flex justify-content-between">
-            <IconField>
-                <InputIcon>
-                    <i class="pi pi-search" />
-                </InputIcon>
-                <InputText v-model="filters['global'].value" placeholder="Global Search" />
-            </IconField>
+    <DataTable v-model:expandedRows="expandedRows" :value="secretTableData" v-model:filters="filters" paginator
+        :rows="5" dataKey="key" filterDisplay="row" :loading="loading">
+        <template #header>
+            <div class="d-flex justify-content-between">
+                <IconField>
+                    <InputIcon>
+                        <i class="pi pi-search" />
+                    </InputIcon>
+                    <InputText v-model="filters['global'].value" placeholder="Global Search" />
+                </IconField>
 
-            <RefreshData :reloadFunction="getSecretData" />
-        </div>
-    </template>
-    <template #empty> No data found. </template>
-    <template #loading> Loading secret. Please wait. </template>
-    <Column expander style="width: 5rem" />
-    <Column field="key" header="Key" style="min-width: 12rem">
-        <template #body="{ data }">
-            {{ data.key }}
+                <RefreshData :reloadFunction="getSecretData" />
+            </div>
         </template>
-    </Column>
-    <Column field="value" header="Value" style="min-width: 12rem">
-        <template #body="{ data }">
-            {{ data.value.length > 10 ? data.value.slice(0, 7) : data.value }}{{ data.value.length > 10 ? '...' : '' }}
+        <template #empty> No data found. </template>
+        <template #loading> Loading secret. Please wait. </template>
+        <Column expander style="width: 5rem" />
+        <Column field="key" header="Key" style="min-width: 12rem">
+            <template #body="{ data }">
+                {{ data.key }}
+            </template>
+        </Column>
+        <Column field="value" header="Value" style="min-width: 12rem">
+            <template #body="{ data }">
+                {{ data.value.length > 10 ? data.value.slice(0, 7) : data.value }}{{ data.value.length > 10 ? '...' : ''
+                }}
+            </template>
+        </Column>
+        <template #expansion="slotProps">
+            <div class="selectable">
+                {{ (slotProps.data.decodedValue && slotProps.data.decodedValue != '') ? slotProps.data.decodedValue :
+                    slotProps.data.value }}
+            </div>
         </template>
-    </Column>
-    <template #expansion="slotProps">
-        <div class="selectable">
-            {{ (slotProps.data.decodedValue && slotProps.data.decodedValue != '') ? slotProps.data.decodedValue : slotProps.data.value }}
-        </div>
-    </template>
     </DataTable>
 </template>
 
@@ -46,7 +48,7 @@ import type { SecretDataTableItem, SecretListType, SecretType } from '@src/types
 const route = useRoute();
 
 const secretName = ref('');
-const secretListData = ref<SecretListType| null>(null);
+const secretListData = ref<SecretListType | null>(null);
 const secretTableData = ref<SecretDataTableItem[]>([]);
 const loading = ref(true);
 const filters = ref({
@@ -62,20 +64,30 @@ const getSecretData = () => {
         subType: 'secretData',
         command: HelperUtils.prepareCommand(
             kubeCmds.getNamespacedResourceByName.replace("{{resType}}", 'secret')
-            .replace("{{resName}}", secretName.value)),
+                .replace("{{resName}}", secretName.value)),
     });
 }
 
 window.addEventListener('message', (event) => {
     loading.value = false;
-    if(event.data.type == "secretData"){
-        if (event.data.data && event.data.data.error) {
-            console.error("Error fetching secret data:", event.data.data.errormessage || event.data.data.message);
+    if (event.data.type == "secretData") {
+        let configDetails: SecretType | null = null;
+        const rawData = event.data.data;
+
+        if (rawData && rawData.error) {
+            console.error("Error fetching secret data:", rawData.errormessage || rawData.message);
             secretTableData.value = [];
             secretListData.value = null;
             return;
         }
+
         try {
+            if (typeof rawData === 'string') {
+                configDetails = JSON.parse(rawData) as SecretType;
+            } else if (typeof rawData === 'object') {
+                configDetails = rawData as SecretType;
+            }
+
             const decodeBase64 = (datastr: string) => {
                 try {
                     return atob(datastr);
@@ -83,8 +95,8 @@ window.addEventListener('message', (event) => {
                     return '';
                 }
             }
-            const configDetails = JSON.parse(event.data.data) as SecretType;
-            if(configDetails?.data && Object.keys(configDetails.data).length > 0){
+
+            if (configDetails?.data && Object.keys(configDetails.data).length > 0) {
                 const tData = Object.entries(configDetails.data).map(([key, value]) => {
                     const decodedValue = decodeBase64(value);
                     return {
@@ -95,12 +107,12 @@ window.addEventListener('message', (event) => {
                 });
                 secretTableData.value = [...tData];
                 secretListData.value = configDetails;
-            }else{
+            } else {
                 secretTableData.value = [];
                 secretListData.value = null;
             }
         } catch (error) {
-            console.error("Failed to parse secret data:", event.data.data, error);
+            console.error("Failed to parse secret data:", typeof rawData === 'object' ? JSON.stringify(rawData) : rawData, error);
             secretTableData.value = [];
             secretListData.value = null;
         }
@@ -108,17 +120,14 @@ window.addEventListener('message', (event) => {
 });
 
 onMounted(() => {
-    if((route.params.secretname !== null ) && 
-    (typeof route.params.secretname === 'string')){
+    if ((route.params.secretname !== null) &&
+        (typeof route.params.secretname === 'string')) {
         secretName.value = route.params.secretname;
         getSecretData();
     }
-    
+
 });
 
 
 </script>
-<style scoped>
-
-
-</style>
+<style scoped></style>
