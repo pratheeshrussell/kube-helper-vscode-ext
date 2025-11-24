@@ -12,36 +12,36 @@ export default class CreateClusterDetailsPanelUI {
             contextName: string;
         }
     ) { }
-    show(title ="Cluster Details") {
+    show(title = "Cluster Details") {
         const panel = vscode.window.createWebviewPanel(
             'KubeHelperClusterDetailsWindow', // Unique identifier for the panel
             `Cluster ${this._params.clusterName}`, // Title displayed in the panel
             vscode.ViewColumn.One, // The column in which to show the panel
             {
-              enableScripts:true,
-              enableForms: true,
-              retainContextWhenHidden: true,
+                enableScripts: true,
+                enableForms: true,
+                retainContextWhenHidden: true,
             }
-          );
-          
-          panel.title = `${title}`;
-          
-          panel.iconPath = {
+        );
+
+        panel.title = `${title}`;
+
+        panel.iconPath = {
             light: vscode.Uri.joinPath(this._extensionUri, 'assets/images/kube-helper.png'),
             dark: vscode.Uri.joinPath(this._extensionUri, 'assets/images/kube-helper.png')
-          };
-          panel.webview.onDidReceiveMessage(async (data) => {
+        };
+        panel.webview.onDidReceiveMessage(async (data) => {
             if (data.type === MessageTypes.RUN_CMD_TERMINAL) {
                 // open terminal and run command
                 runCommandTerminal(data.command);
             } else if (data.type === MessageTypes.RUN_CMD_RESULT) {
-              // Run command and return result
-              runCommand(data.command).then((result) => {
-                panel.webview.postMessage({
-                    type: data.subType,
-                    data: result
+                // Run command and return result
+                runCommand(data.command).then((result) => {
+                    panel.webview.postMessage({
+                        type: data.subType,
+                        data: result
+                    });
                 });
-            });
             } else if (data.type === MessageTypes.GET_GRAPH_RESOURCES) {
                 const namespace = data.namespace;
                 const context = data.context;
@@ -71,44 +71,44 @@ export default class CreateClusterDetailsPanelUI {
                     });
                 });
             } else if (data.type === MessageTypes.DESCRIBE_RESOURCE) {
-                const { resourceType, resourceName, namespace } = data;
-                runCommand(`kubectl describe ${resourceType} ${resourceName} -n ${namespace}`).then(result => {
+                const { resourceType, resourceName, namespace, context } = data;
+                runCommand(`kubectl describe ${resourceType} ${resourceName} -n ${namespace} --context=${context}`).then(result => {
                     panel.webview.postMessage({ type: MessageTypes.DESCRIBE_RESOURCE_RESULT, data: result });
                 });
             }
-          });
-          // Set the HTML content in the webview panel
-          panel.webview.html = this.getPanelTemplateHTML(panel.webview);
+        });
+        // Set the HTML content in the webview panel
+        panel.webview.html = this.getPanelTemplateHTML(panel.webview);
     }
 
 
     getPanelTemplateHTML(webview: vscode.Webview, requestData: string = '') {
-        let themeKind:vscode.ColorThemeKind = vscode.window.activeColorTheme.kind;
-        
+        let themeKind: vscode.ColorThemeKind = vscode.window.activeColorTheme.kind;
+
         const styleResetUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this._extensionUri, "assets","css", "reset.css")
+            vscode.Uri.joinPath(this._extensionUri, "assets", "css", "reset.css")
         );
         const styleBootstrapUri = webview.asWebviewUri(
-                    vscode.Uri.joinPath(this._extensionUri, "assets","css", "bootstrap-grid.min.css")
-                );
+            vscode.Uri.joinPath(this._extensionUri, "assets", "css", "bootstrap-grid.min.css")
+        );
         const styleVSCodeUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this._extensionUri, "assets","css", "vscode.css")
+            vscode.Uri.joinPath(this._extensionUri, "assets", "css", "vscode.css")
         );
         const styleprimeIcon = webview.asWebviewUri(
-            vscode.Uri.joinPath(this._extensionUri, "assets","css", "primeicons.css")
+            vscode.Uri.joinPath(this._extensionUri, "assets", "css", "primeicons.css")
         );
         const scriptUri = webview.asWebviewUri(
             vscode.Uri.joinPath(
                 this._extensionUri, "dist/view/view.bundle.js")
         );
-        
+
         const styleMainUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, "dist/view/view.css")
         );
 
         vscode.window.onDidChangeActiveColorTheme(() => {
             themeKind = vscode.window.activeColorTheme.kind;
-            webview.postMessage({type: "onThemeChange", value: themeKind});
+            webview.postMessage({ type: "onThemeChange", value: themeKind });
         });
 
         // Use a nonce to only allow a specific script to be run.

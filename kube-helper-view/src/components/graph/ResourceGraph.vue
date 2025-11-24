@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, onUnmounted, ref, computed, watch } from 'vue';
 import { VueFlow, useVueFlow } from '@vue-flow/core';
 import { Controls } from '@vue-flow/controls';
 import { MessageTypes } from '@common/messageTypes';
@@ -158,6 +158,7 @@ const describeResource = (resourceType: string, resourceName: string) => {
         resourceType,
         resourceName,
         namespace: globalStore.namespace,
+        context: globalStore.context,
     });
 };
 
@@ -166,11 +167,11 @@ const getResourceYaml = (resourceType: string, resourceName: string) => {
     tsvscode?.postMessage({
         type: MessageTypes.RUN_CMD_RESULT,
         subType: 'resourceYaml',
-        command: `kubectl get ${resourceType} ${resourceName} -n ${globalStore.namespace} -o yaml`
+        command: `kubectl get ${resourceType} ${resourceName} -n ${globalStore.namespace} --context=${globalStore.context} -o yaml`
     });
 };
 
-window.addEventListener('message', async (event) => {
+const onMessage = async (event: MessageEvent) => {
     if (event.data.type === MessageTypes.GRAPH_RESOURCES_RESULT) {
         const { nodes: parsedNodes, edges: parsedEdges } = parseGraphData(event.data.data);
         const layoutedElements = await getLayoutedElements(parsedNodes, parsedEdges);
@@ -187,7 +188,7 @@ window.addEventListener('message', async (event) => {
     if (event.data.type === 'resourceYaml') {
         yamlOutput.value = event.data.data;
     }
-});
+};
 
 onNodeClick((event) => {
     const node = event.node;
@@ -230,7 +231,12 @@ onPaneClick(() => {
 });
 
 onMounted(() => {
+    window.addEventListener('message', onMessage);
     getGraphData();
+});
+
+onUnmounted(() => {
+    window.removeEventListener('message', onMessage);
 });
 </script>
 
