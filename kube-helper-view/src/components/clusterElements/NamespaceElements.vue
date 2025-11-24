@@ -15,6 +15,7 @@ import RoleBindingList from './elementList/RoleBindingList.vue';
 import SAList from './elementList/SAList.vue';
 import ReplicaSetList from './elementList/ReplicaSetList.vue';
 import DeploymentList from './elementList/DeploymentList.vue';
+import ResourceGraph from '../graph/ResourceGraph.vue';
 import { kubeCmds } from '@src/constants/commands';
 
 const route = useRoute();
@@ -27,13 +28,15 @@ const getEventsCmd = kubeCmds.getNamespacedResourceByType.replace("{{resType}}",
 
 onMounted(() => {
     const name = route.params.namespace;
-    if(name !== null && typeof name === 'string'){
+    if (name !== null && typeof name === 'string') {
         isNamespace.value = true;
         globalStore.namespace = name;
         // namespace should always be the first element
         globalStore.breadcrumbItems = [
-            {label: name, navigateTo: 'namespaceoverview', 
-            params:{namespace: name}, index: 0}
+            {
+                label: name, navigateTo: 'namespaceoverview',
+                params: { namespace: name }, index: 0
+            }
         ];
     }
 })
@@ -47,6 +50,7 @@ onMounted(() => {
     <div class="ns-over-view" v-if="isNamespace">
         <Tabs v-model:value="value" scrollable lazy>
             <TabList>
+                <Tab value="graph">Graph</Tab>
                 <Tab value="pods">Pods</Tab>
                 <Tab value="svcs">Services</Tab>
                 <Tab value="replicasets">Replica Sets</Tab>
@@ -62,8 +66,11 @@ onMounted(() => {
                 <Tab value="sa">Service Account</Tab>
             </TabList>
             <TabPanels>
+                <TabPanel value="graph">
+                    <ResourceGraph :active="true" />
+                </TabPanel>
                 <TabPanel value="pods">
-                   <PodList />
+                    <PodList />
                 </TabPanel>
                 <TabPanel value="svcs">
                     <ServiceList />
@@ -106,7 +113,4 @@ onMounted(() => {
     </div>
 </template>
 
-<style scoped>
-
-
-</style>
+<style scoped></style>

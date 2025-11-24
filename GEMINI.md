@@ -45,3 +45,7 @@ npm test
 *   **Type Checking:** The project uses TypeScript for static type checking. To check for type errors, use the command `npm run check-types`.
 *   **Code Style:** The code follows the standard TypeScript and Vue.js conventions.
 *   **Contribution:** Contributions are welcome. Please refer to the `README.md` file for more information.
+
+
+### Build Validation
+To validate the view build, run `npm run compile:view` from the root folder. Note that running tests is not necessary as there are no tests written for the view or backend.

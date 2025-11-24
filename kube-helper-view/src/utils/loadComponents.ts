@@ -1,4 +1,4 @@
-import { Tooltip } from "primevue";
+import { Card, Tooltip } from "primevue";
 import type { App } from "vue";
 
 import DataTable from 'primevue/datatable';
@@ -24,6 +24,7 @@ import Textarea from 'primevue/textarea';
 import RefreshData from "../components/common/RefreshData.vue";
 import { VAceEditor } from 'vue3-ace-editor';
 import 'ace-builds/src-noconflict/mode-text';
+import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/ext-searchbox';
 
 import 'ace-builds/src-noconflict/theme-cloud_editor_dark';
@@ -36,14 +37,14 @@ export const loadPrimeComponents = (app: App<Element>) => {
 
     const components = {
         DataTable, Column, InputText, InputIcon, Checkbox,
-        IconField, Button,Tabs, TabList, Tab, InputNumber,
-        TabPanels, TabPanel,DataView, Dialog,RadioButton,
-        RefreshData,VAceEditor,Select, Textarea
-    }
-    
+        IconField, Button, Tabs, TabList, Tab, InputNumber,
+        TabPanels, TabPanel, DataView, Dialog, RadioButton,
+        RefreshData, VAceEditor, Select, Textarea, Card
+    };
+
     Object.entries(components).forEach(([key, value]) => {
         app.component(key, value);
-    })
-    
-    
-}
+    });
+
+
+};
