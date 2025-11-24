@@ -28,13 +28,15 @@ const getEventsCmd = kubeCmds.getNamespacedResourceByType.replace("{{resType}}",
 
 onMounted(() => {
     const name = route.params.namespace;
-    if(name !== null && typeof name === 'string'){
+    if (name !== null && typeof name === 'string') {
         isNamespace.value = true;
         globalStore.namespace = name;
         // namespace should always be the first element
         globalStore.breadcrumbItems = [
-            {label: name, navigateTo: 'namespaceoverview', 
-            params:{namespace: name}, index: 0}
+            {
+                label: name, navigateTo: 'namespaceoverview',
+                params: { namespace: name }, index: 0
+            }
         ];
     }
 })
@@ -65,10 +67,10 @@ onMounted(() => {
             </TabList>
             <TabPanels>
                 <TabPanel value="graph">
-                    <ResourceGraph :active="value === 'graph'" />
+                    <ResourceGraph :active="true" />
                 </TabPanel>
                 <TabPanel value="pods">
-                   <PodList />
+                    <PodList />
                 </TabPanel>
                 <TabPanel value="svcs">
                     <ServiceList />
@@ -111,7 +113,4 @@ onMounted(() => {
     </div>
 </template>
 
-<style scoped>
-
-
-</style>
+<style scoped></style>

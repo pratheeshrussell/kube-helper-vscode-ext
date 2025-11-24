@@ -47,5 +47,5 @@ npm test
 *   **Contribution:** Contributions are welcome. Please refer to the `README.md` file for more information.
 
 
-To validate builds
-run npm run compile:view from root folder. dont have to run the test command as there are no tests written
+### Build Validation
+To validate the view build, run `npm run compile:view` from the root folder. Note that running tests is not necessary as there are no tests written for the view or backend.
