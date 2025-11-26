@@ -2,6 +2,9 @@
 
 All notable changes to the "kube-helper" extension will be documented in this file.
 
+## [0.0.3]
+no changes added. 
+
 ## [0.0.2]
 
 ### Added
