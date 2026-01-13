@@ -47,7 +47,11 @@ This extension depends on the kubectl CLI. Make sure it's installed and accessib
 
 ## ⚙️ Extension Settings
 
-Click on the side bar icon to activate the extension
+Click on the side bar icon to activate the extension.
+
+| Setting | Default | Description |
+| :--- | :--- | :--- |
+| `kubeHelper.command.maxBuffer` | `50` | Max buffer size in MB for command execution (e.g., kubectl outputs). Increase this if you encounter "stdout maxBuffer exceeded" errors when fetching large resources. |
 
 ## 🐞 Known Issues
 

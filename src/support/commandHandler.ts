@@ -7,7 +7,9 @@ import { Utils } from './utils';
 const execAsync = promisify(exec);
 export const runCommand = async (command: string) => {
     try {
-        const { stdout, stderr } = await execAsync(command);
+        const config = vscode.workspace.getConfiguration('kubeHelper');
+        const maxBufferMB = config.get<number>('command.maxBuffer') || 50;
+        const { stdout, stderr } = await execAsync(command, { maxBuffer: 1024 * 1024 * maxBufferMB });
         if (stderr) {
             return {
                 output: stdout,
@@ -27,7 +29,7 @@ export const runCommand = async (command: string) => {
 export const runCommandTerminal = async (command: string) => {
     try {
         const terminal = vscode.window.createTerminal({
-            env:{
+            env: {
                 "KUBE_EDITOR": "code --wait --new-window --reuse-window"
             },
             isTransient: false

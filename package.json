@@ -5,7 +5,7 @@
   "publisher": "PratheeshRussell",
   "repository": "https://github.com/pratheeshrussell/kube-helper-vscode-ext",
   "icon": "assets/images/kube-helper.png",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -50,6 +50,16 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "Kube Helper",
+      "properties": {
+        "kubeHelper.command.maxBuffer": {
+          "type": "number",
+          "default": 50,
+          "description": "Max buffer size in MB for command execution (e.g., kubectl outputs)."
+        }
+      }
     }
   },
   "scripts": {
