@@ -10,23 +10,24 @@ import StorageClassList from './elementList/StorageClassList.vue';
 import ClusterRoleList from './elementList/ClusterRoleList.vue';
 import ClusterRoleBindingList from './elementList/ClusterRoleBindingList.vue';
 import IngressClassList from './elementList/IngressClassList.vue';
+import DashboardTab from '../dashboard/DashboardTab.vue';
 import { kubeCmds } from '@src/constants/commands';
 
-const value = ref('ns');
+const value = ref('dashboard');
 const isContext = ref(false);
 
 const getEventsCmd = kubeCmds.getNamespacedResourceByType.replace("{{resType}}", 'events');
 
 
 onMounted(() => {
-    const body=document.getElementsByTagName('body')[0];
-    if(body){
+    const body = document.getElementsByTagName('body')[0];
+    if (body) {
         const curcontext = body.getAttribute('data-context-name');
-        if(curcontext){
+        if (curcontext) {
             globalStore.context = curcontext;
             globalStore.namespace = null;
             isContext.value = true;
-        } 
+        }
     }
 })
 
@@ -39,6 +40,7 @@ onMounted(() => {
     <div class="cluster-over-view" v-if="isContext">
         <Tabs v-model:value="value" scrollable lazy>
             <TabList>
+                <Tab value="dashboard">Dashboard</Tab>
                 <Tab value="ns">Namespaces</Tab>
                 <Tab value="nodes">Nodes</Tab>
                 <Tab value="pods">Pods</Tab>
@@ -50,8 +52,11 @@ onMounted(() => {
                 <Tab value="ic">Ingress Classes</Tab>
             </TabList>
             <TabPanels>
+                <TabPanel value="dashboard">
+                    <DashboardTab />
+                </TabPanel>
                 <TabPanel value="ns">
-                   <Namespaces />
+                    <Namespaces />
                 </TabPanel>
                 <TabPanel value="nodes">
                     <ClusterNodes />
@@ -82,7 +87,4 @@ onMounted(() => {
     </div>
 </template>
 
-<style scoped>
-
-
-</style>
+<style scoped></style>

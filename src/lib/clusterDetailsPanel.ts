@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { MessageTypes } from '../../common/messageTypes';
 import { Utils } from '../support/utils';
 import { runCommand, runCommandTerminal } from '../support/commandHandler';
+import { EventWatcher } from '../support/eventWatcher';
+
 
 export default class CreateClusterDetailsPanelUI {
 
@@ -30,6 +32,11 @@ export default class CreateClusterDetailsPanelUI {
             light: vscode.Uri.joinPath(this._extensionUri, 'assets/images/kube-helper.png'),
             dark: vscode.Uri.joinPath(this._extensionUri, 'assets/images/kube-helper.png')
         };
+
+        // Subscribe panel to event watcher for timeline
+        const eventWatcher = EventWatcher.getInstance(this._params.contextName);
+        eventWatcher.subscribe(panel);
+
         panel.webview.onDidReceiveMessage(async (data) => {
             if (data.type === MessageTypes.RUN_CMD_TERMINAL) {
                 // open terminal and run command
@@ -75,6 +82,16 @@ export default class CreateClusterDetailsPanelUI {
                 runCommand(`kubectl describe ${resourceType} ${resourceName} -n ${namespace} --context=${context}`).then(result => {
                     panel.webview.postMessage({ type: MessageTypes.DESCRIBE_RESOURCE_RESULT, data: result });
                 });
+            } else if (data.type === MessageTypes.GET_TIMELINE_EVENTS) {
+                // Return buffered timeline events
+                const events = eventWatcher.getEvents();
+                panel.webview.postMessage({
+                    type: MessageTypes.TIMELINE_EVENTS_RESULT,
+                    data: events
+                });
+            } else if (data.type === MessageTypes.CLEAR_TIMELINE) {
+                // Clear all timeline events
+                eventWatcher.clearEvents();
             }
         });
         // Set the HTML content in the webview panel
