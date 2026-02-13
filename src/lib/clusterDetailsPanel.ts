@@ -94,7 +94,6 @@ export default class CreateClusterDetailsPanelUI {
                 eventWatcher.clearEvents();
             } else if (data.type === MessageTypes.GET_CLUSTER_STATS) {
                 const context = data.context;
-                console.log('cluster stats going to fetch...')
                 Promise.all([
                     runCommand(`kubectl get pods --all-namespaces -o json --context=${context}`),
                     runCommand(`kubectl get nodes -o json --context=${context}`),
@@ -108,10 +107,18 @@ export default class CreateClusterDetailsPanelUI {
                         deployments: this.parseDeploymentStats(getOut(deployments)),
                         services: this.parseServiceStats(getOut(services))
                     };
-                    console.log('cluster stats', stats)
                     panel.webview.postMessage({ type: MessageTypes.CLUSTER_STATS_RESULT, data: stats });
                 }).catch(err => {
                     console.error('Failed to fetch cluster stats:', err);
+                });
+            } else if (data.type === MessageTypes.CHECK_ARGOCD_STATUS) {
+                const context = data.context;
+                runCommand(`kubectl get crd applications.argoproj.io --context=${context}`).then((result) => {
+                    const isArgoCDPresent = typeof result === 'string' && !result.includes('Error from server');
+                    panel.webview.postMessage({
+                        type: MessageTypes.ARGOCD_STATUS_RESULT,
+                        data: isArgoCDPresent
+                    });
                 });
             }
         });

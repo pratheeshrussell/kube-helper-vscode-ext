@@ -20,4 +20,8 @@ export enum MessageTypes {
     // Cluster Stats
     GET_CLUSTER_STATS = 'getClusterStats',
     CLUSTER_STATS_RESULT = 'clusterStatsResult',
+
+    // ArgoCD
+    CHECK_ARGOCD_STATUS = 'checkArgoCDStatus',
+    ARGOCD_STATUS_RESULT = 'argoCDStatusResult',
 }

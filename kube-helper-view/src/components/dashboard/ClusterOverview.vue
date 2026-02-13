@@ -10,6 +10,10 @@
             </template>
         </Card>
 
+        <div v-if="isArgoCDPresent" class="argocd-section">
+            <Button label="ArgoCD Resources" size="small" icon="pi pi-external-link" @click="manageArgoCD" />
+        </div>
+
         <Card>
             <template #title>Cluster Status</template>
             <template #content>
@@ -55,7 +59,7 @@
                         <div class="knob-container">
                             <div class="stat-details">
                                 <div class="stat-main-value">{{ stats.deployments.ready }} / {{ stats.deployments.total
-                                }}</div>
+                                    }}</div>
                                 <div class="stat-sub-text" v-if="stats.deployments.failed > 0"><span
                                         class="text-danger">{{
                                             stats.deployments.failed }} Not Ready</span></div>
@@ -88,6 +92,7 @@ import { globalStore } from '../../store/store';
 
 // PrimeVue components
 import Card from 'primevue/card';
+import Button from 'primevue/button';
 import { MessageTypes } from '@common/messageTypes';
 import type { DeployStats, NodeStats, PodStats, ServiceStats } from '@src/types/stats.type';
 
@@ -96,6 +101,13 @@ const namespace = ref<string | null>(null);
 let pollingInterval: any = null;
 
 const currentContext = globalStore.context;
+
+const isArgoCDPresent = ref(false);
+
+const manageArgoCD = () => {
+    console.log('Manage ArgoCD clicked');
+    // TODO: Implement Manage ArgoCD functionality
+};
 
 
 const stats = ref<{
@@ -115,6 +127,8 @@ const handleMessage = (event: MessageEvent) => {
     const message = event.data;
     if (message.type === MessageTypes.CLUSTER_STATS_RESULT) {
         stats.value = message.data;
+    } else if (message.type === MessageTypes.ARGOCD_STATUS_RESULT) {
+        isArgoCDPresent.value = message.data;
     }
 };
 
@@ -126,6 +140,13 @@ const fetchStats = () => {
         });
 };
 
+const getArgoCDStatus = () => {
+    tsvscode?.postMessage({
+        type: MessageTypes.CHECK_ARGOCD_STATUS,
+        context: currentContext
+    });
+};
+
 onMounted(() => {
     contextName.value = globalStore.context || '';
     namespace.value = globalStore.namespace;
@@ -134,6 +155,7 @@ onMounted(() => {
 
     // Initial fetch
     fetchStats();
+    getArgoCDStatus();
 
     // Start polling (30s)
     pollingInterval = setInterval(fetchStats, 30000);
@@ -150,6 +172,13 @@ onUnmounted(() => {
     padding: 1rem;
     height: 100%;
     overflow-y: auto;
+}
+
+.argocd-section {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: end;
+    align-items: flex-end;
 }
 
 .info-row {
