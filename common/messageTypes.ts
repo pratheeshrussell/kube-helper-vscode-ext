@@ -16,4 +16,8 @@ export enum MessageTypes {
     TIMELINE_EVENTS_RESULT = 'timelineEventsResult',
     TIMELINE_EVENT_NEW = 'timelineEventNew',
     CLEAR_TIMELINE = 'clearTimeline',
+
+    // Cluster Stats
+    GET_CLUSTER_STATS = 'getClusterStats',
+    CLUSTER_STATS_RESULT = 'clusterStatsResult',
 }

@@ -92,6 +92,27 @@ export default class CreateClusterDetailsPanelUI {
             } else if (data.type === MessageTypes.CLEAR_TIMELINE) {
                 // Clear all timeline events
                 eventWatcher.clearEvents();
+            } else if (data.type === MessageTypes.GET_CLUSTER_STATS) {
+                const context = data.context;
+                console.log('cluster stats going to fetch...')
+                Promise.all([
+                    runCommand(`kubectl get pods --all-namespaces -o json --context=${context}`),
+                    runCommand(`kubectl get nodes -o json --context=${context}`),
+                    runCommand(`kubectl get deployments --all-namespaces -o json --context=${context}`),
+                    runCommand(`kubectl get services --all-namespaces -o json --context=${context}`)
+                ]).then(([pods, nodes, deployments, services]) => {
+                    const getOut = (res: any) => typeof res === 'string' ? res : (res.output || '');
+                    const stats = {
+                        pods: this.parsePodStats(getOut(pods)),
+                        nodes: this.parseNodeStats(getOut(nodes)),
+                        deployments: this.parseDeploymentStats(getOut(deployments)),
+                        services: this.parseServiceStats(getOut(services))
+                    };
+                    console.log('cluster stats', stats)
+                    panel.webview.postMessage({ type: MessageTypes.CLUSTER_STATS_RESULT, data: stats });
+                }).catch(err => {
+                    console.error('Failed to fetch cluster stats:', err);
+                });
             }
         });
         // Set the HTML content in the webview panel
@@ -159,5 +180,88 @@ export default class CreateClusterDetailsPanelUI {
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
+    }
+
+    private parsePodStats(output: string) {
+        if (!output) { return { total: 0, running: 0, failed: 0, pending: 0 }; }
+        try {
+            const data = JSON.parse(output);
+            const items = data.items || [];
+            let running = 0, failed = 0, pending = 0;
+            const failedPods: any[] = [];
+
+            items.forEach((item: any) => {
+                const phase = item.status?.phase;
+                if (phase === 'Running' || phase === 'Succeeded') { running++; }
+                else if (phase === 'Pending') { pending++; }
+                else {
+                    failed++;
+                    failedPods.push({
+                        name: item.metadata.name,
+                        namespace: item.metadata.namespace,
+                        reason: item.status.reason,
+                        message: item.status.message
+                    });
+                }
+            });
+
+            return {
+                total: items.length, running, failed, pending, data: {
+                    failed: failedPods
+                }
+            };
+        } catch (e) {
+            console.error('Error parsing pod stats:', e);
+            return { total: 0, running: 0, failed: 0, pending: 0 };
+        }
+    }
+
+    private parseNodeStats(output: string) {
+        if (!output) { return { total: 0, ready: 0, notReady: 0 }; }
+        try {
+            const data = JSON.parse(output);
+            const items = data.items || [];
+            let ready = 0;
+
+            items.forEach((item: any) => {
+                const conditions = item.status?.conditions || [];
+                const readyCondition = conditions.find((c: any) => c.type === 'Ready');
+                if (readyCondition && readyCondition.status === 'True') { ready++; }
+            });
+
+            return { total: items.length, ready, notReady: items.length - ready };
+        } catch (e) {
+            return { total: 0, ready: 0, notReady: 0 };
+        }
+    }
+
+    private parseDeploymentStats(output: string) {
+        if (!output) { return { total: 0, ready: 0, failed: 0 }; }
+        try {
+            const data = JSON.parse(output);
+            const items = data.items || [];
+            let readyCount = 0;
+
+            items.forEach((item: any) => {
+                const readyReplicas = item.status?.readyReplicas || 0;
+                const replicas = item.spec?.replicas || 0;
+                if (readyReplicas === replicas && replicas > 0) { readyCount++; }
+            });
+
+            return { total: items.length, ready: readyCount, failed: items.length - readyCount };
+        } catch (e) {
+            return { total: 0, ready: 0, failed: 0 };
+        }
+    }
+
+    private parseServiceStats(output: string) {
+        if (!output) { return { total: 0 }; }
+        try {
+            const data = JSON.parse(output);
+            const items = data.items || [];
+            return { total: items.length };
+        } catch (e) {
+            return { total: 0 };
+        }
     }
 }

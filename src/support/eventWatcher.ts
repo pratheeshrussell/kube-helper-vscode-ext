@@ -4,6 +4,8 @@ import { randomUUID } from 'crypto';
 import { TimelineEvent, K8sEvent, WatchEvent } from '../types/timeline.types';
 import { MessageTypes } from '../../common/messageTypes';
 
+import { JsonStreamParser } from './jsonStreamParser';
+
 /**
  * EventWatcher - Singleton service to watch Kubernetes events
  * Manages kubectl watch processes and broadcasts events to subscribed panels
@@ -16,12 +18,13 @@ export class EventWatcher {
     private eventBuffer: TimelineEvent[] = [];
     private maxEvents: number;
     private context: string;
-    private buffer = '';
+    private jsonParser: JsonStreamParser;
 
     private constructor(context: string) {
         this.context = context;
         const config = vscode.workspace.getConfiguration('kubeHelper');
         this.maxEvents = config.get<number>('timeline.maxEvents') || 1000;
+        this.jsonParser = new JsonStreamParser();
     }
 
     /**
@@ -84,6 +87,7 @@ export class EventWatcher {
             'get', 'events',
             '--all-namespaces',
             '--watch',
+            '--output-watch-events',
             '-o', 'json',
             '--context', this.context
         ]);
@@ -123,7 +127,7 @@ export class EventWatcher {
         }
 
         // Clear buffers
-        this.buffer = '';
+        this.jsonParser = new JsonStreamParser();
         this.eventBuffer = [];
     }
 
@@ -131,100 +135,45 @@ export class EventWatcher {
      * Handle incoming data from kubectl watch
      */
     private handleWatchData(data: Buffer): void {
-        this.buffer += data.toString();
+        this.jsonParser.append(data.toString());
 
-        // Try to parse complete JSON objects from the buffer
-        while (this.buffer.length > 0) {
-            const trimmed = this.buffer.trim();
-            if (!trimmed) {
-                this.buffer = '';
-                break;
-            }
-
-            // Find the end of the first JSON object
-            let braceCount = 0;
-            let inString = false;
-            let escaped = false;
-            let endIndex = -1;
-
-            for (let i = 0; i < trimmed.length; i++) {
-                const char = trimmed[i];
-
-                if (escaped) {
-                    escaped = false;
-                    continue;
-                }
-
-                if (char === '\\') {
-                    escaped = true;
-                    continue;
-                }
-
-                if (char === '"') {
-                    inString = !inString;
-                    continue;
-                }
-
-                if (!inString) {
-                    if (char === '{') {
-                        braceCount++;
-                    } else if (char === '}') {
-                        braceCount--;
-                        if (braceCount === 0) {
-                            endIndex = i + 1;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // If we found a complete JSON object
-            if (endIndex > 0) {
-                const jsonStr = trimmed.substring(0, endIndex);
-                this.buffer = trimmed.substring(endIndex).trim();
-
-                try {
-                    const parsed = JSON.parse(jsonStr);
-
-                    // Handle initial EventList (kubectl outputs this first)
-                    if (parsed.kind === 'EventList' && parsed.items) {
-                        console.log(`[EventWatcher] Received initial EventList with ${parsed.items.length} events`);
-                        // Process existing events as ADDED
-                        for (const event of parsed.items) {
-                            const watchEvent: WatchEvent<K8sEvent> = {
-                                type: 'ADDED',
-                                object: event
-                            };
-                            const timelineEvent = this.convertToTimelineEvent(watchEvent);
-                            this.addEvent(timelineEvent);
-                        }
-                    }
-                    // Handle watch events (streaming updates)
-                    else if (parsed.type && parsed.object) {
-                        const watchEvent: WatchEvent<K8sEvent> = parsed;
-                        const timelineEvent = this.convertToTimelineEvent(watchEvent);
-                        this.addEvent(timelineEvent);
-                    }
-                    // Handle raw Event objects (some k8s versions/configs stream these directly)
-                    else if (parsed.kind === 'Event') {
+        let parsed: any;
+        while ((parsed = this.jsonParser.extractNext()) !== null) {
+            try {
+                // Handle initial EventList (kubectl outputs this first)
+                if (parsed.kind === 'EventList' && parsed.items) {
+                    console.log(`[EventWatcher] Received initial EventList with ${parsed.items.length} events`);
+                    // Process existing events as ADDED
+                    for (const event of parsed.items) {
                         const watchEvent: WatchEvent<K8sEvent> = {
-                            type: 'ADDED', // Treat raw event occurrence as ADDED
-                            object: parsed
+                            type: 'ADDED',
+                            object: event
                         };
                         const timelineEvent = this.convertToTimelineEvent(watchEvent);
                         this.addEvent(timelineEvent);
                     }
-                    // Unknown format - log and skip
-                    else {
-                        console.warn('[EventWatcher] Unknown event format. Kind:', parsed.kind, 'Keys:', Object.keys(parsed));
-                    }
-                } catch (e) {
-                    console.error('[EventWatcher] Failed to parse event:', e);
-                    console.error('[EventWatcher] Problematic JSON:', jsonStr.substring(0, 200));
                 }
-            } else {
-                // No complete object yet, wait for more data
-                break;
+                // Handle watch events (streaming updates)
+                else if (parsed.type && parsed.object) {
+                    const watchEvent: WatchEvent<K8sEvent> = parsed;
+                    const timelineEvent = this.convertToTimelineEvent(watchEvent);
+                    this.addEvent(timelineEvent);
+                }
+                // Handle raw Event objects (some k8s versions/configs stream these directly)
+                else if (parsed.kind === 'Event') {
+                    const watchEvent: WatchEvent<K8sEvent> = {
+                        type: 'ADDED', // Treat raw event occurrence as ADDED
+                        object: parsed
+                    };
+                    const timelineEvent = this.convertToTimelineEvent(watchEvent);
+                    this.addEvent(timelineEvent);
+                }
+                // Unknown format - log and skip
+                else {
+                    console.warn('[EventWatcher] Unknown event format. Kind:', parsed.kind, 'Keys:', Object.keys(parsed));
+                }
+            } catch (e) {
+                console.error('[EventWatcher] Failed to process event:', e);
             }
         }
     }
