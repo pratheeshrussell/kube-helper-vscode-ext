@@ -24,4 +24,8 @@ export enum MessageTypes {
     // ArgoCD
     CHECK_ARGOCD_STATUS = 'checkArgoCDStatus',
     ARGOCD_STATUS_RESULT = 'argoCDStatusResult',
+
+    // ArgoCD namespace detection (for admin secret)
+    GET_ARGOCD_NAMESPACE = 'getArgoCDNamespace',
+    ARGOCD_NAMESPACE_RESULT = 'argoCDNamespaceResult',
 }

@@ -94,18 +94,39 @@ export default class CreateClusterDetailsPanelUI {
                 eventWatcher.clearEvents();
             } else if (data.type === MessageTypes.GET_CLUSTER_STATS) {
                 const context = data.context;
-                Promise.all([
-                    runCommand(`kubectl get pods --all-namespaces -o json --context=${context}`),
-                    runCommand(`kubectl get nodes -o json --context=${context}`),
-                    runCommand(`kubectl get deployments --all-namespaces -o json --context=${context}`),
-                    runCommand(`kubectl get services --all-namespaces -o json --context=${context}`)
-                ]).then(([pods, nodes, deployments, services]) => {
+                runCommand(`kubectl get pods,nodes,deployments,services --all-namespaces -o json --context=${context}`).then((result) => {
                     const getOut = (res: any) => typeof res === 'string' ? res : (res.output || '');
+                    const outStr = getOut(result);
+                    
+                    let podsList = { items: [] };
+                    let nodesList = { items: [] };
+                    let deploymentsList = { items: [] };
+                    let servicesList = { items: [] };
+
+                    try {
+                        if (outStr && !outStr.startsWith('error')) {
+                            const parsed = JSON.parse(outStr);
+                            const items = parsed.items || [];
+                            
+                            const podsItems = items.filter((item: any) => item.kind === 'Pod');
+                            const nodesItems = items.filter((item: any) => item.kind === 'Node');
+                            const deploymentsItems = items.filter((item: any) => item.kind === 'Deployment');
+                            const servicesItems = items.filter((item: any) => item.kind === 'Service');
+
+                            podsList = { items: podsItems };
+                            nodesList = { items: nodesItems };
+                            deploymentsList = { items: deploymentsItems };
+                            servicesList = { items: servicesItems };
+                        }
+                    } catch (e) {
+                        console.error('Error splitting cluster stats:', e);
+                    }
+
                     const stats = {
-                        pods: this.parsePodStats(getOut(pods)),
-                        nodes: this.parseNodeStats(getOut(nodes)),
-                        deployments: this.parseDeploymentStats(getOut(deployments)),
-                        services: this.parseServiceStats(getOut(services))
+                        pods: this.parsePodStats(JSON.stringify(podsList)),
+                        nodes: this.parseNodeStats(JSON.stringify(nodesList)),
+                        deployments: this.parseDeploymentStats(JSON.stringify(deploymentsList)),
+                        services: this.parseServiceStats(JSON.stringify(servicesList))
                     };
                     panel.webview.postMessage({ type: MessageTypes.CLUSTER_STATS_RESULT, data: stats });
                 }).catch(err => {
@@ -118,6 +139,24 @@ export default class CreateClusterDetailsPanelUI {
                     panel.webview.postMessage({
                         type: MessageTypes.ARGOCD_STATUS_RESULT,
                         data: isArgoCDPresent
+                    });
+                });
+            } else if (data.type === MessageTypes.GET_ARGOCD_NAMESPACE) {
+                const context = data.context;
+                runCommand(`kubectl get deploy -A --context=${context} -o json`).then((result) => {
+                    let argoNamespace = '';
+                    try {
+                        if (typeof result === 'string') {
+                            const parsed = JSON.parse(result);
+                            const argoServer = (parsed.items || []).find(
+                                (item: any) => item.metadata?.name === 'argocd-server'
+                            );
+                            argoNamespace = argoServer?.metadata?.namespace || '';
+                        }
+                    } catch (e) { /* ignore parse errors */ }
+                    panel.webview.postMessage({
+                        type: MessageTypes.ARGOCD_NAMESPACE_RESULT,
+                        data: argoNamespace
                     });
                 });
             }

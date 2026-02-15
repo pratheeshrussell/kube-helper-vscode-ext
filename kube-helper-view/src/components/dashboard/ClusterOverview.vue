@@ -17,67 +17,58 @@
         <Card>
             <template #title>Cluster Status</template>
             <template #content>
-                <div class="stats-grid">
+                <div class="stats-list">
                     <!-- PODS -->
                     <div class="stat-item">
-                        <div class="stat-header">
+                        <div class="stat-left">
                             <i class="pi pi-box stat-icon"></i>
                             <span class="stat-label">Pods</span>
                         </div>
-                        <div class="knob-container">
-                            <div class="stat-details">
-                                <div class="stat-main-value">{{ stats.pods.running }} / {{ stats.pods.total }}</div>
-                                <div class="stat-sub-text" v-if="stats.pods.failed > 0"><span class="text-danger">{{
-                                    stats.pods.failed }} Failed</span></div>
-                                <div class="stat-sub-text" v-if="stats.pods.pending > 0"><span class="text-warn">{{
-                                    stats.pods.pending }} Pending</span></div>
+                        <div class="stat-right">
+                            <div class="stat-main-value">{{ stats.pods.running }} / {{ stats.pods.total }}</div>
+                            <div class="stat-sub-texts" v-if="stats.pods.failed > 0 || stats.pods.pending > 0">
+                                <span class="text-danger" v-if="stats.pods.failed > 0">{{ stats.pods.failed }} Failed</span>
+                                <span class="text-warn" v-if="stats.pods.pending > 0">{{ stats.pods.pending }} Pending</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- NODES -->
                     <div class="stat-item">
-                        <div class="stat-header">
+                        <div class="stat-left">
                             <i class="pi pi-server stat-icon"></i>
                             <span class="stat-label">Nodes</span>
                         </div>
-                        <div class="knob-container">
-                            <div class="stat-details">
-                                <div class="stat-main-value">{{ stats.nodes.ready }} / {{ stats.nodes.total }}</div>
-                                <div class="stat-sub-text" v-if="stats.nodes.notReady > 0"><span class="text-danger">{{
-                                    stats.nodes.notReady }} Not Ready</span></div>
+                        <div class="stat-right">
+                            <div class="stat-main-value">{{ stats.nodes.ready }} / {{ stats.nodes.total }}</div>
+                            <div class="stat-sub-texts" v-if="stats.nodes.notReady > 0">
+                                <span class="text-danger">{{ stats.nodes.notReady }} Not Ready</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- DEPLOYMENTS -->
                     <div class="stat-item">
-                        <div class="stat-header">
+                        <div class="stat-left">
                             <i class="pi pi-sitemap stat-icon"></i>
                             <span class="stat-label">Deployments</span>
                         </div>
-                        <div class="knob-container">
-                            <div class="stat-details">
-                                <div class="stat-main-value">{{ stats.deployments.ready }} / {{ stats.deployments.total
-                                    }}</div>
-                                <div class="stat-sub-text" v-if="stats.deployments.failed > 0"><span
-                                        class="text-danger">{{
-                                            stats.deployments.failed }} Not Ready</span></div>
+                        <div class="stat-right">
+                            <div class="stat-main-value">{{ stats.deployments.ready }} / {{ stats.deployments.total }}</div>
+                            <div class="stat-sub-texts" v-if="stats.deployments.failed > 0">
+                                <span class="text-danger">{{ stats.deployments.failed }} Not Ready</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- SERVICES -->
                     <div class="stat-item">
-                        <div class="stat-header">
+                        <div class="stat-left">
                             <i class="pi pi-circle stat-icon"></i>
                             <span class="stat-label">Services</span>
                         </div>
-
-                        <div class="knob-container">
-                            <div class="stat-details">
-                                <div class="stat-main-value">{{ stats.services.total }}</div>
-                            </div>
+                        <div class="stat-right">
+                            <div class="stat-main-value">{{ stats.services.total }}</div>
                         </div>
                     </div>
                 </div>
@@ -95,6 +86,7 @@ import Card from 'primevue/card';
 import Button from 'primevue/button';
 import { MessageTypes } from '@common/messageTypes';
 import type { DeployStats, NodeStats, PodStats, ServiceStats } from '@src/types/stats.type';
+import { useRouter } from 'vue-router';
 
 const contextName = ref('');
 const namespace = ref<string | null>(null);
@@ -103,10 +95,10 @@ let pollingInterval: any = null;
 const currentContext = globalStore.context;
 
 const isArgoCDPresent = ref(false);
+const router = useRouter();
 
 const manageArgoCD = () => {
-    console.log('Manage ArgoCD clicked');
-    // TODO: Implement Manage ArgoCD functionality
+    router.push({ name: 'argocdoverview' });
 };
 
 
@@ -188,75 +180,56 @@ onUnmounted(() => {
     padding: 0.5rem 0;
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .stat-item {
-    padding: 1rem;
+    padding: 0.75rem 1.25rem;
     background-color: var(--surface-card);
     border: 1px solid var(--surface-border);
     border-radius: 8px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.simple-stat {
     flex-direction: row;
-    /* Keep simple stats horizontal-ish */
-    gap: 1rem;
-    justify-content: flex-start;
-    text-align: left;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.stat-header {
+.stat-left {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    margin-bottom: 0.5rem;
-    justify-content: center;
+    gap: 0.75rem;
 }
 
-.knob-container {
+.stat-right {
     display: flex;
     align-items: center;
     gap: 1rem;
-}
-
-.stat-details {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    font-size: 0.85rem;
-}
-
-.stat-icon {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-}
-
-.stat-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-color-secondary);
-    text-transform: uppercase;
 }
 
 .stat-main-value {
     font-weight: bold;
     font-size: 1.1rem;
-    margin-bottom: 0.25rem;
 }
 
-.stat-value {
-    font-size: 1.5rem;
+.stat-sub-texts {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.stat-icon {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    font-size: 0.95rem;
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--text-color-secondary);
+    text-transform: uppercase;
 }
 
 .text-danger {
@@ -269,12 +242,5 @@ onUnmounted(() => {
 
 .text-success {
     color: var(--green-500);
-}
-
-/* Responsive tweaks */
-@media (max-width: 1024px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
 }
 </style>
