@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { MessageTypes } from '../../common/messageTypes';
 import { Utils } from '../support/utils';
 import { runCommand, runCommandTerminal } from '../support/commandHandler';
+import { EventWatcher } from '../support/eventWatcher';
+
 
 export default class CreateClusterDetailsPanelUI {
 
@@ -30,6 +32,11 @@ export default class CreateClusterDetailsPanelUI {
             light: vscode.Uri.joinPath(this._extensionUri, 'assets/images/kube-helper.png'),
             dark: vscode.Uri.joinPath(this._extensionUri, 'assets/images/kube-helper.png')
         };
+
+        // Subscribe panel to event watcher for timeline
+        const eventWatcher = EventWatcher.getInstance(this._params.contextName);
+        eventWatcher.subscribe(panel);
+
         panel.webview.onDidReceiveMessage(async (data) => {
             if (data.type === MessageTypes.RUN_CMD_TERMINAL) {
                 // open terminal and run command
@@ -74,6 +81,83 @@ export default class CreateClusterDetailsPanelUI {
                 const { resourceType, resourceName, namespace, context } = data;
                 runCommand(`kubectl describe ${resourceType} ${resourceName} -n ${namespace} --context=${context}`).then(result => {
                     panel.webview.postMessage({ type: MessageTypes.DESCRIBE_RESOURCE_RESULT, data: result });
+                });
+            } else if (data.type === MessageTypes.GET_TIMELINE_EVENTS) {
+                // Return buffered timeline events
+                const events = eventWatcher.getEvents();
+                panel.webview.postMessage({
+                    type: MessageTypes.TIMELINE_EVENTS_RESULT,
+                    data: events
+                });
+            } else if (data.type === MessageTypes.CLEAR_TIMELINE) {
+                // Clear all timeline events
+                eventWatcher.clearEvents();
+            } else if (data.type === MessageTypes.GET_CLUSTER_STATS) {
+                const context = data.context;
+                runCommand(`kubectl get pods,nodes,deployments,services --all-namespaces -o json --context=${context}`).then((result) => {
+                    const getOut = (res: any) => typeof res === 'string' ? res : (res.output || '');
+                    const outStr = getOut(result);
+                    
+                    let podsList = { items: [] };
+                    let nodesList = { items: [] };
+                    let deploymentsList = { items: [] };
+                    let servicesList = { items: [] };
+
+                    try {
+                        if (outStr && !outStr.startsWith('error')) {
+                            const parsed = JSON.parse(outStr);
+                            const items = parsed.items || [];
+                            
+                            const podsItems = items.filter((item: any) => item.kind === 'Pod');
+                            const nodesItems = items.filter((item: any) => item.kind === 'Node');
+                            const deploymentsItems = items.filter((item: any) => item.kind === 'Deployment');
+                            const servicesItems = items.filter((item: any) => item.kind === 'Service');
+
+                            podsList = { items: podsItems };
+                            nodesList = { items: nodesItems };
+                            deploymentsList = { items: deploymentsItems };
+                            servicesList = { items: servicesItems };
+                        }
+                    } catch (e) {
+                        console.error('Error splitting cluster stats:', e);
+                    }
+
+                    const stats = {
+                        pods: this.parsePodStats(JSON.stringify(podsList)),
+                        nodes: this.parseNodeStats(JSON.stringify(nodesList)),
+                        deployments: this.parseDeploymentStats(JSON.stringify(deploymentsList)),
+                        services: this.parseServiceStats(JSON.stringify(servicesList))
+                    };
+                    panel.webview.postMessage({ type: MessageTypes.CLUSTER_STATS_RESULT, data: stats });
+                }).catch(err => {
+                    console.error('Failed to fetch cluster stats:', err);
+                });
+            } else if (data.type === MessageTypes.CHECK_ARGOCD_STATUS) {
+                const context = data.context;
+                runCommand(`kubectl get crd applications.argoproj.io --context=${context}`).then((result) => {
+                    const isArgoCDPresent = typeof result === 'string' && !result.includes('Error from server');
+                    panel.webview.postMessage({
+                        type: MessageTypes.ARGOCD_STATUS_RESULT,
+                        data: isArgoCDPresent
+                    });
+                });
+            } else if (data.type === MessageTypes.GET_ARGOCD_NAMESPACE) {
+                const context = data.context;
+                runCommand(`kubectl get deploy -A --context=${context} -o json`).then((result) => {
+                    let argoNamespace = '';
+                    try {
+                        if (typeof result === 'string') {
+                            const parsed = JSON.parse(result);
+                            const argoServer = (parsed.items || []).find(
+                                (item: any) => item.metadata?.name === 'argocd-server'
+                            );
+                            argoNamespace = argoServer?.metadata?.namespace || '';
+                        }
+                    } catch (e) { /* ignore parse errors */ }
+                    panel.webview.postMessage({
+                        type: MessageTypes.ARGOCD_NAMESPACE_RESULT,
+                        data: argoNamespace
+                    });
                 });
             }
         });
@@ -142,5 +226,88 @@ export default class CreateClusterDetailsPanelUI {
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
+    }
+
+    private parsePodStats(output: string) {
+        if (!output) { return { total: 0, running: 0, failed: 0, pending: 0 }; }
+        try {
+            const data = JSON.parse(output);
+            const items = data.items || [];
+            let running = 0, failed = 0, pending = 0;
+            const failedPods: any[] = [];
+
+            items.forEach((item: any) => {
+                const phase = item.status?.phase;
+                if (phase === 'Running' || phase === 'Succeeded') { running++; }
+                else if (phase === 'Pending') { pending++; }
+                else {
+                    failed++;
+                    failedPods.push({
+                        name: item.metadata.name,
+                        namespace: item.metadata.namespace,
+                        reason: item.status.reason,
+                        message: item.status.message
+                    });
+                }
+            });
+
+            return {
+                total: items.length, running, failed, pending, data: {
+                    failed: failedPods
+                }
+            };
+        } catch (e) {
+            console.error('Error parsing pod stats:', e);
+            return { total: 0, running: 0, failed: 0, pending: 0 };
+        }
+    }
+
+    private parseNodeStats(output: string) {
+        if (!output) { return { total: 0, ready: 0, notReady: 0 }; }
+        try {
+            const data = JSON.parse(output);
+            const items = data.items || [];
+            let ready = 0;
+
+            items.forEach((item: any) => {
+                const conditions = item.status?.conditions || [];
+                const readyCondition = conditions.find((c: any) => c.type === 'Ready');
+                if (readyCondition && readyCondition.status === 'True') { ready++; }
+            });
+
+            return { total: items.length, ready, notReady: items.length - ready };
+        } catch (e) {
+            return { total: 0, ready: 0, notReady: 0 };
+        }
+    }
+
+    private parseDeploymentStats(output: string) {
+        if (!output) { return { total: 0, ready: 0, failed: 0 }; }
+        try {
+            const data = JSON.parse(output);
+            const items = data.items || [];
+            let readyCount = 0;
+
+            items.forEach((item: any) => {
+                const readyReplicas = item.status?.readyReplicas || 0;
+                const replicas = item.spec?.replicas || 0;
+                if (readyReplicas === replicas && replicas > 0) { readyCount++; }
+            });
+
+            return { total: items.length, ready: readyCount, failed: items.length - readyCount };
+        } catch (e) {
+            return { total: 0, ready: 0, failed: 0 };
+        }
+    }
+
+    private parseServiceStats(output: string) {
+        if (!output) { return { total: 0 }; }
+        try {
+            const data = JSON.parse(output);
+            const items = data.items || [];
+            return { total: items.length };
+        } catch (e) {
+            return { total: 0 };
+        }
     }
 }

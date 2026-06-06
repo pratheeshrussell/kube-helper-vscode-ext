@@ -30,12 +30,17 @@ code --install-extension  kube-helper-0.0.1.vsix
 
 ## ✨ Features
 
-* List Resources like Pods, services, etc., in a cluster
-* Edit definition of resources like pods, deployments from VSCode
-* View logs directly in VSCode
-* Exec into Containers
-* Port forward resources
-* Create Debug Pods
+- **Listing Resources:** Easily browse namespaces, pods, deployments, and other Kubernetes resources.
+- **Editing Resources:** Modify resource configurations directly from the editor.
+- **Viewing Logs:** Stream and view pod logs in real-time.
+- **Executing Commands:** Run commands inside pods using `kubectl exec`.
+- **Port Forwarding:** Forward ports from pods to your local machine.
+- **Debug Pods:** Quickly create ephemeral debug containers.
+- **Graph View:** Visualize resource relationships and dependencies.
+- **Timeline & Event Tracking:** Real-time dashboard showing cluster overview and streaming Kubernetes events.
+- **Kubeconfig Context Management:** View context lists in the sidebar, identify the active context with a star indicator, and easily set other contexts as the active default context.
+- **ArgoCD Dashboard:** Browse ArgoCD Applications, Projects, and ApplicationSets. Check application health, sync status, initiate synchronization, refresh configurations, and inspect resources without needing the ArgoCD CLI.
+
 
 ![list namespaces](docs/feat_img_1.png)
 ![namespace details](docs/feat_img_3.png)
@@ -52,6 +57,8 @@ Click on the side bar icon to activate the extension.
 | Setting | Default | Description |
 | :--- | :--- | :--- |
 | `kubeHelper.command.maxBuffer` | `50` | Max buffer size in MB for command execution (e.g., kubectl outputs). Increase this if you encounter "stdout maxBuffer exceeded" errors when fetching large resources. |
+| `kubeHelper.timeline.maxEvents` | `1000` | Maximum number of timeline events to retain in memory. Older events are automatically removed when this limit is reached. |
+| `kubeHelper.timeline.autoScroll` | `true` | Automatically scroll the timeline to show the latest events as they arrive. |
 
 ## 🐞 Known Issues
 

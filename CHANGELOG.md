@@ -2,6 +2,12 @@
 
 All notable changes to the "kube-helper" extension will be documented in this file.
 
+## [0.0.6]
+### Added
+- Kubeconfig Context Management
+- ArgoCD Dashboard
+
+
 ## [0.0.5]
 ### Bugfixes
 - Fixed the issue where the extension was not working for large commands

@@ -22,4 +22,23 @@ export const kubeCmds = {
     runDebugPod: "kubectl run -i --tty --rm {{podName}} --image={{image}} --restart=Never {{namespace}} {{context}} --command -- {{command}}",
 
     nodeDebugPod: "kubectl debug node/{{nodename}} -it --image={{image}} {{context}}",
+
+    // ArgoCD CRD Resources
+    getArgoCDApplications: "kubectl get applications.argoproj.io {{namespace}} {{context}} -o json",
+    getArgoCDProjects: "kubectl get appprojects.argoproj.io {{namespace}} {{context}} -o json",
+    getArgoCDAppSets: "kubectl get applicationsets.argoproj.io {{namespace}} {{context}} -o json",
+    describeArgoCDResource: "kubectl describe {{resType}} {{resName}} {{namespace}} {{context}}",
+    deleteArgoCDResource: "kubectl delete {{resType}} {{resName}} {{namespace}} {{context}}",
+    editArgoCDResource: "kubectl edit {{resType}} {{resName}} {{namespace}} {{context}}",
+
+    // ArgoCD Sync/Refresh (run in terminal)
+    syncArgoApp: "kubectl patch application {{resName}} -n {{argoNamespace}} {{context}} --type merge -p '{\"operation\":{\"initiatedBy\":{\"username\":\"kube-helper\"},\"sync\":{\"syncStrategy\":{\"hook\":{}}}}}'",
+    refreshArgoApp: "kubectl annotate application {{resName}} -n {{argoNamespace}} {{context}} argocd.argoproj.io/refresh=normal --overwrite",
+    hardRefreshArgoApp: "kubectl annotate application {{resName}} -n {{argoNamespace}} {{context}} argocd.argoproj.io/refresh=hard --overwrite",
+
+    // Kubeconfig Context Management
+    setDefaultContext: "kubectl config use-context {{contextName}}",
+
+    // ArgoCD Admin Secret
+    getArgoCDAdminSecret: "kubectl get secret argocd-initial-admin-secret -n {{argoNamespace}} {{context}} -o jsonpath='{.data.password}'",
 } as const;

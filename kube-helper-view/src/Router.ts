@@ -17,35 +17,43 @@ import RoleBindElement from "./components/clusterElements/RoleBindElement.vue";
 import SAElement from "./components/clusterElements/SAElement.vue";
 import ReplsetElement from "./components/clusterElements/ReplsetElement.vue";
 import DeploymentElement from "./components/clusterElements/DeploymentElement.vue";
-const routes:Readonly<RouteRecordRaw[]> = [
-    {path:'/sidebar', name:'sidebar', component: Sidebar},
-    {path:'/clusterDetails', name:'clusterDetails', component: ClusterView,
+import ArgoDashboard from "./components/argoElements/ArgoDashboard.vue";
+import ArgoAppElement from "./components/argoElements/ArgoAppElement.vue";
+import ArgoProjectElement from "./components/argoElements/ArgoProjectElement.vue";
+const routes: Readonly<RouteRecordRaw[]> = [
+    { path: '/sidebar', name: 'sidebar', component: Sidebar },
+    {
+        path: '/clusterDetails', name: 'clusterDetails', component: ClusterView,
         children: [
-            {path: 'overview', name: 'clusteroverview', component: ClusterWideElements},
-            {path: 'ns/:namespace', name: 'namespaceoverview', component: NamespaceElements},
-            {path: 'pod/:podname', name: 'podoverview', component: PodElement},
-            {path: 'pod/:podname/c/:container', name: 'containeroverview', component: ContainerElement},
+            { path: 'overview', name: 'clusteroverview', component: ClusterWideElements },
+            { path: 'ns/:namespace', name: 'namespaceoverview', component: NamespaceElements },
+            { path: 'pod/:podname', name: 'podoverview', component: PodElement },
+            { path: 'pod/:podname/c/:container', name: 'containeroverview', component: ContainerElement },
 
-            {path: 'svc/:svcname', name: 'svcoverview', component: ServiceElement},
+            { path: 'svc/:svcname', name: 'svcoverview', component: ServiceElement },
 
-            {path: 'configmap/:cmname', name: 'configmapoverview', component: ConfigMapElement},
-            {path: 'secret/:secretname', name: 'secretoverview', component: SecretElement},
-            {path: 'ingress/:ingressname', name: 'ingressoverview', component: IngressElement},
+            { path: 'configmap/:cmname', name: 'configmapoverview', component: ConfigMapElement },
+            { path: 'secret/:secretname', name: 'secretoverview', component: SecretElement },
+            { path: 'ingress/:ingressname', name: 'ingressoverview', component: IngressElement },
 
-            {path: 'clusterrole/:crname', name: 'clusterRoleoverview', component: ClusterRoleElement},
-            {path: 'clusterrolebind/:crbname', name: 'clusterRoleBindoverview', component: ClusterRoleBindElement},
-            
-            
-            {path: 'role/:rolename', name: 'roleoverview', component: RoleElement},
-            {path: 'rolebind/:rolebindname', name: 'rolebindoverview', component: RoleBindElement},
-            {path: 'serviceaccount/:saname', name: 'saoverview', component: SAElement},
+            { path: 'clusterrole/:crname', name: 'clusterRoleoverview', component: ClusterRoleElement },
+            { path: 'clusterrolebind/:crbname', name: 'clusterRoleBindoverview', component: ClusterRoleBindElement },
 
-            {path: 'replset/:rsname', name: 'replsetoverview', component: ReplsetElement},
-            {path: 'deployment/:depname', name: 'deploymentoverview', component: DeploymentElement},
-            
-            {path: 'node/:nodename', name: 'nodeoverview', component: NodeElement},
 
-            {path: '', redirect: { name: 'clusteroverview' }},
+            { path: 'role/:rolename', name: 'roleoverview', component: RoleElement },
+            { path: 'rolebind/:rolebindname', name: 'rolebindoverview', component: RoleBindElement },
+            { path: 'serviceaccount/:saname', name: 'saoverview', component: SAElement },
+
+            { path: 'replset/:rsname', name: 'replsetoverview', component: ReplsetElement },
+            { path: 'deployment/:depname', name: 'deploymentoverview', component: DeploymentElement },
+
+            { path: 'node/:nodename', name: 'nodeoverview', component: NodeElement },
+
+            { path: 'argocd', name: 'argocdoverview', component: ArgoDashboard },
+            { path: 'argocd/app/:appname', name: 'argoappoverview', component: ArgoAppElement },
+            { path: 'argocd/project/:projectname', name: 'argoprojectoverview', component: ArgoProjectElement },
+
+            { path: '', redirect: { name: 'clusteroverview' } },
         ]
     }
 ];
