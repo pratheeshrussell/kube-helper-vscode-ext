@@ -36,6 +36,9 @@ export const kubeCmds = {
     refreshArgoApp: "kubectl annotate application {{resName}} -n {{argoNamespace}} {{context}} argocd.argoproj.io/refresh=normal --overwrite",
     hardRefreshArgoApp: "kubectl annotate application {{resName}} -n {{argoNamespace}} {{context}} argocd.argoproj.io/refresh=hard --overwrite",
 
+    // Kubeconfig Context Management
+    setDefaultContext: "kubectl config use-context {{contextName}}",
+
     // ArgoCD Admin Secret
     getArgoCDAdminSecret: "kubectl get secret argocd-initial-admin-secret -n {{argoNamespace}} {{context}} -o jsonpath='{.data.password}'",
 } as const;
