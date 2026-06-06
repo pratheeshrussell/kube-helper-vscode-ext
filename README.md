@@ -38,6 +38,9 @@ code --install-extension  kube-helper-0.0.1.vsix
 - **Debug Pods:** Quickly create ephemeral debug containers.
 - **Graph View:** Visualize resource relationships and dependencies.
 - **Timeline & Event Tracking:** Real-time dashboard showing cluster overview and streaming Kubernetes events.
+- **Kubeconfig Context Management:** View context lists in the sidebar, identify the active context with a star indicator, and easily set other contexts as the active default context.
+- **ArgoCD Dashboard:** Browse ArgoCD Applications, Projects, and ApplicationSets. Check application health, sync status, initiate synchronization, refresh configurations, and inspect resources without needing the ArgoCD CLI.
+
 
 ![list namespaces](docs/feat_img_1.png)
 ![namespace details](docs/feat_img_3.png)
