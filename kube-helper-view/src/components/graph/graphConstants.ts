@@ -1,11 +1,14 @@
 export const EDGE_STYLE = {
     default: {
-        stroke: 'blue',
-        'stroke-width': 2,
-        'stroke-dasharray': 'none',
+        stroke: '#64748b',
+        strokeWidth: 1.5,
+        strokeDasharray: 'none',
     },
     selected: {
-        stroke: 'red',
-        'stroke-width': 5,
+        stroke: '#38bdf8',
+        strokeWidth: 2.5,
+    },
+    dimmed: {
+        opacity: 0.15,
     }
 };
