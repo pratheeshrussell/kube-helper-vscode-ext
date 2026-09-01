@@ -23,6 +23,11 @@ export const kubeCmds = {
 
     nodeDebugPod: "kubectl debug node/{{nodename}} -it --image={{image}} {{context}}",
 
+    // Workload Operations
+    rolloutRestartWorkload: "kubectl rollout restart {{resType}}/{{resName}} {{namespace}} {{context}}",
+    scaleWorkload: "kubectl scale {{resType}}/{{resName}} --replicas={{replicas}} {{namespace}} {{context}}",
+    getWorkloadLogs: "kubectl logs {{resType}}/{{resName}} {{namespace}} {{context}} --all-containers=true --tail=100",
+
     // ArgoCD CRD Resources
     getArgoCDApplications: "kubectl get applications.argoproj.io {{namespace}} {{context}} -o json",
     getArgoCDProjects: "kubectl get appprojects.argoproj.io {{namespace}} {{context}} -o json",
